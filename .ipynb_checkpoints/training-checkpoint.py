@@ -113,11 +113,11 @@ class Training:
 
             # record and reset train metric
             self.train_loss.append(self.train_metric.result().numpy())
-            self.train_metric.reset_states()
+            self.train_metric.reset_state()
 
             # record and reset valid metric
             self.valid_loss.append(self.valid_metric.result().numpy())
-            self.valid_metric.reset_states()
+            self.valid_metric.reset_state()
 
             # save if best
             self.save_best(save_best_folder, save_below)
