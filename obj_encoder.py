@@ -16,8 +16,8 @@ class ObjEncoder:
         self.model    = ObjectEncoder().model
         self.training = Training(self)
 
-    def fit(self, optimizer):
-        self.training.fit(optimizer)
+    def fit(self, optimizer, save_best_folder, save_below):
+        self.training.fit(optimizer, save_best_folder, save_below)
 
 # +
 # obj_encoder = ObjEncoder(records_list = ['/Users/codyfalkosky/Desktop/Object_Encoder_Training/examples_3240.tfr'], 
