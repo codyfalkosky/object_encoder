@@ -73,7 +73,8 @@ class Training:
     def save_history(self, run, save_dir):
         history = {'train loss':self.train_loss,
                    'valid loss':self.valid_loss,
-                   'optimizer' :self.optimizer.get_config()}
+                   'optimizer' :self.optimizer.get_config(),
+                   'loss_style':self.parent_obj.loss_style}
 
         with open(f'{save_dir}/run_{run}_history.pkl', 'wb') as file:
             pickle.dump(history, file)
