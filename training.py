@@ -52,7 +52,24 @@ class Training:
             plt.ylim([0, 1])
         plt.show()
 
-    def fit(self, optimizer):
+    def save_best(self, save_best_folder, save_below):
+        '''
+        saves best model to save_best_folder, if save_best_folder = '' does nothing
+
+        Args:
+            save_best_folder (str) : like "path/to/save/folder" # no final forward-slash
+        Returns:
+            model saved to save_best_folder/yolov2_model_{str_loss}.h5"
+        '''
+
+        if save_best_folder:
+            if self.valid_loss[-1] == min(self.valid_loss):
+                if self.valid_loss[-1] < save_below:
+                    str_loss = f"{self.valid_loss[-1]:.5f}"
+                    str_loss = str_loss.replace('.', '')
+                    self.parent_obj.save_model(f"{save_best_folder}/obj_encoder_model_{str_loss}.h5")
+
+    def fit(self, optimizer, save_best_folder, save_below):
         '''
         basic fit function for object encoder
 
@@ -93,6 +110,9 @@ class Training:
             # record and reset valid metric
             self.valid_loss.append(self.valid_metric.result().numpy())
             self.valid_metric.reset_states()
+
+            # save if best
+            self.save_best(save_best_folder, save_below)
 
             # show loss
             self.plot_loss()
