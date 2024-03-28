@@ -67,7 +67,7 @@ class Training:
                 if self.valid_loss[-1] < save_below:
                     str_loss = f"{self.valid_loss[-1]:.5f}"
                     str_loss = str_loss.replace('.', '')
-                    self.parent_obj.save_model(f"{save_best_folder}/obj_encoder_model_{str_loss}.h5")
+                    self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.h5")
 
     def fit(self, optimizer, save_best_folder, save_below):
         '''

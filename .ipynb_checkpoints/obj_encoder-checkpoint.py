@@ -7,6 +7,8 @@ from .training import Training
 
 class ObjEncoder:
     def __init__(self, records_list, n_train_examples, loss='cosine'):
+        self.loss_style = loss
+        
         if loss == 'cosine':
             self.loss     = LossC().calc_loss
         elif loss == 'euclidian':
