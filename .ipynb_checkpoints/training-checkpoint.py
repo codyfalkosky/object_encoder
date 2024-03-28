@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tqdm.notebook import tqdm
 from IPython.display import clear_output
+import pickle
 
 
 # +
@@ -68,6 +69,13 @@ class Training:
                     str_loss = f"{self.valid_loss[-1]:.5f}"
                     str_loss = str_loss.replace('.', '')
                     self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.h5")
+
+    def save_history(self, run, save_dir):
+        history = {'train loss':self.train_loss,
+                   'valid loss':self.valid_loss}
+
+        with open(f'{save_dir}/run_{run}_history.pkl', 'wb') as file:
+            pickle.dump(history, file)
 
     def fit(self, optimizer, save_best_folder, save_below):
         '''
