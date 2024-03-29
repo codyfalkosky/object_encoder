@@ -1,1 +1,1 @@
-from .obj_encoder import ObjEncoder
+from .obj_encoder import ObjectEncoder
