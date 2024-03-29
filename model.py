@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Input, Conv2D, Dense, MaxPool2D, BatchNormal
 from tensorflow.keras.utils import plot_model
 
 
-class ObjectEncoder:
+class ObjEncoder:
     '''
     Example:
         >>> model = ObjectEncoder().model

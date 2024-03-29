@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Input, Conv2D, Dense, MaxPool2D, BatchNormal
 from tensorflow.keras.utils import plot_model
 
 
-class ObjectEncoder:
+class ObjEncoder:
     '''
     Example:
         >>> model = ObjectEncoder().model
@@ -89,7 +89,7 @@ class ObjectEncoder:
         model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
 
         return model
-      
+
 
 
 if __name__ == '__main__':

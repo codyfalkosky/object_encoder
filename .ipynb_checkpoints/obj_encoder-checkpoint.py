@@ -1,7 +1,7 @@
 import tensorflow as tf
 from .data import Data
 from .loss import LossC, LossE
-from .model import ObjectEncoder
+from .model import ObjEncoder
 from .training import Training
 
 
@@ -21,7 +21,7 @@ class ObjectEncoder:
         self.dataset['valid']  = Data(valid_data_paths).dataset
 
         # initalize model
-        self.model    = ObjectEncoder().model
+        self.model    = ObjEncoder().model
 
         # load training loops
         self.training = Training(self)
