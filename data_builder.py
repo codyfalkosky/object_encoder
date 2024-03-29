@@ -9,7 +9,7 @@ from tqdm.notebook import tqdm
 tf.keras.utils.set_random_seed(2)
 tf.config.experimental.enable_op_determinism()
 
-parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Train/*'
+parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Valid/*'
 seq_folders = glob.glob(parent_glob)
 
 
@@ -165,7 +165,7 @@ class DataBuilder:
         return example
 
 
-save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Train/obj_encoder_train_2.tfr'
+save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Valid/obj_encoder_valid_2.tfr'
 
 # +
 writer = tf.io.TFRecordWriter(save_file)

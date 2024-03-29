@@ -5,7 +5,7 @@ from .model import ObjectEncoder
 from .training import Training
 
 
-class ObjEncoder:
+class ObjectEncoder:
     def __init__(self, train_data_paths, valid_data_paths, loss='cosine'):
         
         # two alternate styles of calculating loss are possible
