@@ -10,10 +10,8 @@ class Data:
     
     '''
     
-    def __init__(self, records_path_list, n_train_examples):
+    def __init__(self, records_path_list):
         self.records_path_list = records_path_list
-        self.n_train_examples  = n_train_examples
-        self.dataset = {}
         self._build_dataset()
 
     @staticmethod
@@ -50,15 +48,11 @@ class Data:
         return {'objects':objects, 'coords':coords, 'labels':labels}
 
     def _build_dataset(self):
-        dataset = tf.data.TFRecordDataset(self.records_path_list)
-        dataset = dataset.map(self.parse_tfrecord_fn)
-        dataset = dataset.shuffle(buffer_size=1024)
+        self.dataset = tf.data.TFRecordDataset(self.records_path_list)
+        self.dataset = self.dataset.map(self.parse_tfrecord_fn)
+        self.dataset = self.dataset.cache()
+        self.dataset = self.dataset.shuffle(buffer_size=1024)
         
-        self.dataset['train'] = dataset.take(self.n_train_examples)
-        self.dataset['train'] = self.dataset['train'].cache()
-
-        self.dataset['valid'] = dataset.skip(self.n_train_examples)
-        self.dataset['valid'] = self.dataset['valid'].cache()
 
 
 if __name__ == '__main__':

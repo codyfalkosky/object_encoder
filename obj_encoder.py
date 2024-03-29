@@ -6,16 +6,24 @@ from .training import Training
 
 
 class ObjEncoder:
-    def __init__(self, records_list, n_train_examples, loss='cosine'):
-        self.loss_style = loss
+    def __init__(self, train_data_paths, valid_data_paths, loss='cosine'):
         
+        # two alternate styles of calculating loss are possible
+        self.loss_style = loss
         if loss == 'cosine':
             self.loss     = LossC().calc_loss
         elif loss == 'euclidian':
             self.loss     = LossE().calc_loss
-                   
-        self.dataset  = Data(records_list, n_train_examples).dataset
+
+        # load all datasets
+        self.dataset  = {}
+        self.dataset['train']  = Data(train_data_paths).dataset
+        self.dataset['valid']  = Data(valid_data_paths).dataset
+
+        # initalize model
         self.model    = ObjectEncoder().model
+
+        # load training loops
         self.training = Training(self)
 
     def fit(self, optimizer, save_best_folder, save_below):

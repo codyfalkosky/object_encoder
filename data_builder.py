@@ -6,8 +6,10 @@ import matplotlib.pyplot as plt
 from boxes import Boxes
 from IPython.display import clear_output
 from tqdm.notebook import tqdm
+tf.keras.utils.set_random_seed(2)
+tf.config.experimental.enable_op_determinism()
 
-parent_glob = '/Users/codyfalkosky/Desktop/Siamese_Data/*'
+parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Train/*'
 seq_folders = glob.glob(parent_glob)
 
 
@@ -41,8 +43,9 @@ class DataBuilder:
 
     'for converting raw img, obj_labels to objs, labels, coords'
 
-    def __init__(self, path):
+    def __init__(self, path, distortion=None):
         self.path = path
+        self.distortion = distortion
 
         # annotation paths
         self.anot = self._get_all_anot_paths(path)
@@ -73,12 +76,23 @@ class DataBuilder:
         labels = file[:, 0]
         coords = file[:, 1:5]
 
+        if self.distortion:
+            d0  = coords.shape[0]
+            x_d = tf.random.uniform([d0, 1], self.distortion['x_min'], self.distortion['x_max'])
+            y_d = tf.random.uniform([d0, 1], self.distortion['y_min'], self.distortion['y_max'])
+            h_d = tf.random.uniform([d0, 1], self.distortion['h_min'], self.distortion['h_max'])
+            w_d = tf.random.uniform([d0, 1], self.distortion['w_min'], self.distortion['w_max'])
+            
+            dist_matrix = tf.concat([x_d, y_d, h_d, w_d], axis=1)
+            coords *= dist_matrix
+
         return labels, coords
 
     def _coords_to_extract(self, coords):
         'converts relative float coords to absolute int coords'
         coords = Boxes.scale(coords, 416, 416)
         coords = Boxes.convert(coords, 'cxcywh_xyxy')
+        coords = tf.clip_by_value(coords, 0, 416)
         coords = tf.round(coords)
         coords = tf.cast(coords, tf.int32)
         return coords
@@ -151,20 +165,48 @@ class DataBuilder:
         return example
 
 
-save_file = '/Users/codyfalkosky/Desktop/Object_Encoder_Training/examples_3240.tfr'
+save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Train/obj_encoder_train_2.tfr'
 
 # +
 writer = tf.io.TFRecordWriter(save_file)
 
 print('Serializing Data')
 
+distortion = {
+    'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
+    'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
+}
+
 for folder in tqdm(seq_folders):
 
-    data    = DataBuilder(folder)
+    data    = DataBuilder(folder, distortion=distortion)
     example = data.serialize()
 
     writer.write(example)
 
 writer.close()
 # -
+# ## SHOW EXTRACTIONS
+
+# +
+# distortion = {
+#     'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
+#     'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
+# }
+
+# data = DataBuilder(seq_folders[1], distortion=distortion)
+
+# +
+# idxs = np.random.randint(0, data.objs.shape[0], 24)
+
+# plt.figure(figsize=(10, 5))
+
+# for i in range(24):
+#     plt.subplot(4, 6, i+1)
+#     plt.imshow(data.objs[idxs[i]])
+#     plt.axis('off')
+
+# plt.show()
+# -
+
 
