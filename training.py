@@ -43,7 +43,7 @@ class Training:
         '''
         clear_output(wait=True)
 
-        plt.figure(figsize=(5, 10))
+        plt.figure(figsize=(10, 5))
         plt.subplot(1,2,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
@@ -86,10 +86,12 @@ class Training:
                     self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.weights.h5")
 
     def save_history(self, run, save_dir):
-        history = {'train loss':self.train_loss,
-                   'valid loss':self.valid_loss,
-                   'optimizer' :self.optimizer.get_config(),
-                   'loss_style':self.parent_obj.loss_style}
+        history = {'train loss'    : self.train_loss,
+                   'valid loss'    : self.valid_loss,
+                   'train accuracy': self.train_accuracy,
+                   'valid accuracy': self.valid_accuracy,
+                   'optimizer'     : self.optimizer.get_config(),
+                   'loss_style'    : self.parent_obj.loss_style}
 
         with open(f'{save_dir}/run_{run}_history.pkl', 'wb') as file:
             pickle.dump(history, file)
