@@ -87,7 +87,7 @@ class LossC:
     def _get_accuracy(self, y_true_labels, y_pred_labels):
         y_pred_labels = self._resolve_labels(y_true_labels, y_pred_labels)
         
-        accuracy = (y_true_labels == y_pred_labels).mean()
+        accuracy = tf.reduce_mean(y_true_labels == y_pred_labels)
     
         return accuracy
         
