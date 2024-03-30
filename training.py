@@ -15,21 +15,26 @@ class Training:
         self.parent_obj   = parent_obj
         self.train_loss   = []
         self.valid_loss   = []
+        self.train_accuracy = []
+        self.valid_accuracy = []
         
         self.train_metric = tf.keras.metrics.Mean()
         self.valid_metric = tf.keras.metrics.Mean()
 
+        self.train_accuracy_metric = tf.keras.metrics.Mean()
+        self.valid_accuracy_metric = tf.keras.metrics.Mean()
+
     def train_step(self, batch):
         with tf.GradientTape() as tape:
             model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=True)
-            loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric)
+            loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric)
 
         gradients = tape.gradient(loss, self.parent_obj.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.parent_obj.model.trainable_variables))
 
     def valid_step(self, batch):
         model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=False)
-        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric)
+        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric)
 
     def plot_loss(self):
         '''
@@ -38,6 +43,8 @@ class Training:
         '''
         clear_output(wait=True)
 
+        plt.figure(figsize=(10, 5))
+        plt.subplot(1,2,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
         plt.plot(self.valid_loss,  color='C1')
@@ -51,6 +58,14 @@ class Training:
             plt.ylim([0, self.valid_loss[-1]*3])
         except:
             plt.ylim([0, 1])
+
+
+        plt.subplot(1,2,1)
+        plt.title('Accuracy')
+
+        plt.plot(self.train_accuracy, color='C0')
+        plt.plot(self.valid_accuracy, color='C1')
+        plt.ylim([0, 1])
         plt.show()
 
     def save_best(self, save_best_folder, save_below):
@@ -78,6 +93,7 @@ class Training:
 
         with open(f'{save_dir}/run_{run}_history.pkl', 'wb') as file:
             pickle.dump(history, file)
+
 
     def fit(self, optimizer, save_best_folder, save_below):
         '''
@@ -113,13 +129,21 @@ class Training:
             for batch in tqdm(self.parent_obj.dataset['valid'], total=valid_data_len):
                 self.valid_step(batch)
 
-            # record and reset train metric
+            # record and reset train loss metric
             self.train_loss.append(self.train_metric.result().numpy())
             self.train_metric.reset_state()
 
-            # record and reset valid metric
+            # record and reset train accuracy metric
+            self.train_accuracy.append(self.train_accuracy_metric.result().numpy())
+            self.train_accuracy_metric.reset_state()
+
+            # record and reset valid loss metric
             self.valid_loss.append(self.valid_metric.result().numpy())
             self.valid_metric.reset_state()
+
+            # record and reset valid accuracy metric
+            self.valid_accuracy.append(self.valid_accuracy_metric.result().numpy())
+            self.valid_accuracy_metric.reset_state()
 
             # save if best
             self.save_best(save_best_folder, save_below)

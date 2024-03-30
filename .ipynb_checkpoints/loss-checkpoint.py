@@ -1,4 +1,5 @@
 import tensorflow as tf
+from .decode import decode_to_labels
 
 
 # +
@@ -65,8 +66,30 @@ class LossC:
 
         y_true = tf.where(same_obj, 1, -1)
         return y_true
+
+    def _resolve_labels(y_true, y_pred):
+        y_pred    = np.array(y_pred)
+        y_true    = np.array(y_true)
+        unique    = np.unique(y_pred)
+        labels    = np.zeros_like(y_pred)
+    
+        for u in unique:
+            mask = y_pred == u
+    
+            mode = statistics.mode(y_true[mask])
+            
+            labels[mask] =  mode
+    
+        return labels
+    
+    def _get_accuracy(y_true_labels, y_pred_labels):
+        y_pred_labels = _resolve_labels(y_true_labels, y_pred_labels)
         
-    def calc_loss(self, model_output, labels, loss_metric):
+        accuracy = (y_true_labels == y_pred_labels).mean()
+    
+        return accuracy
+        
+    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric):
         '''
         Calculates loss for siamese network
 
@@ -87,6 +110,15 @@ class LossC:
         loss   = tf.keras.losses.mean_squared_error(y_true, y_pred)
 
         loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
+
+        ##### ACCURACY #####
+
+        y_true_labels = labels
+        y_pred_labels = decode_to_labels(model_output)
+               
+        accuracy = _get_accuracy(y_true_labels, y_pred_labels)        
+        accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
+        
         
         return loss
 
