@@ -43,7 +43,7 @@ class Training:
         '''
         clear_output(wait=True)
 
-        plt.figure(figsize=(10, 5))
+        plt.figure(figsize=(5, 10))
         plt.subplot(1,2,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
@@ -60,7 +60,7 @@ class Training:
             plt.ylim([0, 1])
 
 
-        plt.subplot(1,2,1)
+        plt.subplot(1,2,2)
         plt.title('Accuracy')
 
         plt.plot(self.train_accuracy, color='C0')
