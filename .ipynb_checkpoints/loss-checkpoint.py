@@ -1,4 +1,6 @@
 import tensorflow as tf
+import numpy as np
+import statistics
 from .decode import decode_to_labels
 
 
@@ -67,7 +69,7 @@ class LossC:
         y_true = tf.where(same_obj, 1, -1)
         return y_true
 
-    def _resolve_labels(y_true, y_pred):
+    def _resolve_labels(self, y_true, y_pred):
         y_pred    = np.array(y_pred)
         y_true    = np.array(y_true)
         unique    = np.unique(y_pred)
@@ -82,8 +84,8 @@ class LossC:
     
         return labels
     
-    def _get_accuracy(y_true_labels, y_pred_labels):
-        y_pred_labels = _resolve_labels(y_true_labels, y_pred_labels)
+    def _get_accuracy(self, y_true_labels, y_pred_labels):
+        y_pred_labels = self._resolve_labels(y_true_labels, y_pred_labels)
         
         accuracy = (y_true_labels == y_pred_labels).mean()
     
@@ -116,10 +118,9 @@ class LossC:
         y_true_labels = labels
         y_pred_labels = decode_to_labels(model_output)
                
-        accuracy = _get_accuracy(y_true_labels, y_pred_labels)        
+        accuracy = self._get_accuracy(y_true_labels, y_pred_labels)        
         accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
-        
-        
+               
         return loss
 
 
