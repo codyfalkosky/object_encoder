@@ -60,7 +60,7 @@ class Training:
             plt.ylim([0, 1])
 
 
-        plt.subplot(1,2,1)
+        plt.subplot(1,2,2)
         plt.title('Accuracy')
 
         plt.plot(self.train_accuracy, color='C0')
@@ -86,16 +86,18 @@ class Training:
                     self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.weights.h5")
 
     def save_history(self, run, save_dir):
-        history = {'train loss':self.train_loss,
-                   'valid loss':self.valid_loss,
-                   'optimizer' :self.optimizer.get_config(),
-                   'loss_style':self.parent_obj.loss_style}
+        history = {'train loss'    : self.train_loss,
+                   'valid loss'    : self.valid_loss,
+                   'train accuracy': self.train_accuracy,
+                   'valid accuracy': self.valid_accuracy,
+                   'optimizer'     : self.optimizer.get_config(),
+                   'loss_style'    : self.parent_obj.loss_style}
 
         with open(f'{save_dir}/run_{run}_history.pkl', 'wb') as file:
             pickle.dump(history, file)
 
 
-    def fit(self, optimizer, save_best_folder, save_below):
+    def fit(self, optimizer, save_best_folder, save_below, epochs):
         '''
         basic fit function for object encoder
 
@@ -150,5 +152,8 @@ class Training:
 
             # show loss
             self.plot_loss()
+
+            if len(self.train_accuracy) > epochs:
+                break
     
     

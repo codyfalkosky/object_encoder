@@ -97,7 +97,7 @@ class Training:
             pickle.dump(history, file)
 
 
-    def fit(self, optimizer, save_best_folder, save_below):
+    def fit(self, optimizer, save_best_folder, save_below, epochs):
         '''
         basic fit function for object encoder
 
@@ -152,5 +152,8 @@ class Training:
 
             # show loss
             self.plot_loss()
+
+            if len(self.train_accuracy) > epochs:
+                break
     
     

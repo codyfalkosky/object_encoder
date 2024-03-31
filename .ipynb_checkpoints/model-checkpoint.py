@@ -14,7 +14,7 @@ class ObjEncoder:
 
     def _build_model(self):
         '''
-        Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,)]
+        Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
         and returning a vector of depth 256 encoding the image
         '''
 
