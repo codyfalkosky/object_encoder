@@ -69,21 +69,6 @@ class LossC:
         y_true = tf.where(same_obj, 1, -1)
         return y_true
 
-    # def _resolve_labels(self, y_true, y_pred):
-    #     y_pred    = np.array(y_pred)
-    #     y_true    = np.array(y_true)
-    #     unique    = np.unique(y_pred)
-    #     labels    = np.zeros_like(y_pred)
-    
-    #     for u in unique:
-    #         mask = y_pred == u
-    
-    #         mode = statistics.mode(y_true[mask])
-            
-    #         labels[mask] =  mode
-    
-    #     return labels
-
     def _unique_ordered(self, array):
         'returns unique elements, ordered from most common to least'
         array = np.array(array)
@@ -220,8 +205,50 @@ class LossE:
 
         y_true = tf.where(same_obj, 0, 10)
         return y_true
+
+    def _unique_ordered(self, array):
+        'returns unique elements, ordered from most common to least'
+        array = np.array(array)
+    
+        unique, counts = np.unique(array, return_counts=True)
+    
+        ordered_index = np.argsort(-counts)
+    
+        return unique[ordered_index]
+
+    def _resolve_labels(self, y_true, y_pred):
+        'resolves y_pred to choose same labeling scheme as y_true, with no match = -1'
+        y_pred     = np.array(y_pred)
+        y_true     = np.array(y_true)
+        y_resolved = np.full(y_pred.shape, -1)
         
-    def calc_loss(self, model_output, labels, loss_metric):
+        y_true_uni_ord = self._unique_ordered(y_true)
+        used = set()
+    
+        for u in y_true_uni_ord:
+            y_pred_subset = y_pred[y_true == u]
+    
+            y_pred_sub_uni_ord = self._unique_ordered(y_pred_subset)
+    
+            for unique_pred in y_pred_sub_uni_ord:
+                if unique_pred not in used:
+                    used.add(unique_pred)
+    
+                    correct = (y_true == u) & (y_pred == unique_pred)
+            
+                    y_resolved[correct] = u
+                    break
+    
+        return y_resolved
+    
+    def _get_accuracy(self, y_true_labels, y_pred_labels):
+        y_pred_labels = self._resolve_labels(y_true_labels, y_pred_labels)
+        
+        accuracy = np.array(y_true_labels == y_pred_labels).mean()
+    
+        return accuracy
+        
+    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
         '''
         Calculates loss for siamese network
 
@@ -241,6 +268,14 @@ class LossE:
 
         loss   = tf.keras.losses.mean_squared_error(y_true, y_pred)
 
-        # loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
-        
+        loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
+
+        ##### ACCURACY #####
+
+        y_true_labels = labels
+        y_pred_labels = decode_to_labels(model_output, **decode_params)
+               
+        accuracy = self._get_accuracy(y_true_labels, y_pred_labels)        
+        accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
+               
         return loss

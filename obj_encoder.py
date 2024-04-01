@@ -16,8 +16,9 @@ class ObjectEncoder:
             self.loss_obj = LossC()
             self.loss     = self.loss_obj.calc_loss
         elif loss == 'euclidian':
-            self.loss     = LossE().calc_loss
-
+            self.loss_obj     = LossE()
+            self.loss         = self.loss_obj.calc_loss
+            
         # load all datasets
         self.dataset  = {}
         if train_data_paths:
@@ -37,8 +38,8 @@ class ObjectEncoder:
         # load training loops
         self.training = Training(self)
 
-    def fit(self, optimizer, save_best_folder, save_below, epochs=None, similarity_threshold=.99, percentile=.3):
-        self.training.fit(optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile)
+    def fit(self, optimizer, save_best_folder, save_below, epochs=None):
+        self.training.fit(optimizer, save_best_folder, save_below, epochs)
 
     def label(self, model_inputs, **kwargs):
         '''
