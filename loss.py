@@ -126,7 +126,7 @@ class LossC:
     
         return accuracy
         
-    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric):
+    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
         '''
         Calculates loss for siamese network
 
@@ -151,7 +151,7 @@ class LossC:
         ##### ACCURACY #####
 
         y_true_labels = labels
-        y_pred_labels = decode_to_labels(model_output)
+        y_pred_labels = decode_to_labels(model_output, **decode_params)
                
         accuracy = self._get_accuracy(y_true_labels, y_pred_labels)        
         accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])

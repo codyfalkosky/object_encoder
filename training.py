@@ -24,17 +24,17 @@ class Training:
         self.train_accuracy_metric = tf.keras.metrics.Mean()
         self.valid_accuracy_metric = tf.keras.metrics.Mean()
 
-    def train_step(self, batch):
+    def train_step(self, batch, decode_params):
         with tf.GradientTape() as tape:
             model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=True)
-            loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric)
+            loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric, decode_params)
 
         gradients = tape.gradient(loss, self.parent_obj.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.parent_obj.model.trainable_variables))
 
-    def valid_step(self, batch):
+    def valid_step(self, batch, decode_params):
         model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=False)
-        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric)
+        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric, decode_params)
 
     def plot_loss(self):
         '''
@@ -97,7 +97,7 @@ class Training:
             pickle.dump(history, file)
 
 
-    def fit(self, optimizer, save_best_folder, save_below, epochs):
+    def fit(self, optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile):
         '''
         basic fit function for object encoder
 
@@ -111,6 +111,8 @@ class Training:
         '''
         self.optimizer = optimizer
 
+        decode_params = {'similarity_threshold' : similarity_threshold, 'percentile': percentile}
+
         print('Loading Training Data')
         train_data_len = 0
         for batch in tqdm(self.parent_obj.dataset['train']):
@@ -123,13 +125,13 @@ class Training:
         
 
         while True:
-            print('Training Epoch:')
+            print(f'Training Epoch: {len(self.train_loss}')
             for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
-                self.train_step(batch)
+                self.train_step(batch, decode_params)
 
             print('Validation Epoch:')
             for batch in tqdm(self.parent_obj.dataset['valid'], total=valid_data_len):
-                self.valid_step(batch)
+                self.valid_step(batch, decode_params)
 
             # record and reset train loss metric
             self.train_loss.append(self.train_metric.result().numpy())

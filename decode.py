@@ -108,7 +108,10 @@ def _find_edge_strength_percentile(graph, node, percentile=.3):
 
     strengths.sort()
 
-    idx = round(len(strengths) * percentile)
+    idx = round(  (len(strengths) - 1) * percentile  )
+
+    if idx < 0:
+        print('NO STRENGTHS FOUND')
 
     return strengths[idx]
 
