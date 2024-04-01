@@ -125,7 +125,7 @@ class Training:
         
 
         while True:
-            print(f'Training Epoch: {len(self.train_loss}')
+            print(f'Training Epoch: {len(self.train_loss)}')
             for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
                 self.train_step(batch, decode_params)
 
