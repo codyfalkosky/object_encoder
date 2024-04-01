@@ -153,7 +153,8 @@ class LossC:
             loss (tensor) : single scalar loss value
         
         '''
-        margin = .7
+        sim_thresh = .7
+        dif_thresh = .5
         
         same_obj    = self._label_mask(labels)                 # [n_labels, n_labels] bool
         cos_sim_mat = self._cosine_similiarty(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
@@ -161,8 +162,8 @@ class LossC:
         similar   = cos_sim_mat[same_obj]
         different = cos_sim_mat[~same_obj]
         
-        sim_loss = tf.reduce_sum(margin - similar[similar < margin])
-        dif_loss = tf.reduce_sum(different[different > margin] - margin)
+        sim_loss = tf.reduce_sum(sim_thresh - similar[similar < sim_thresh])
+        dif_loss = tf.reduce_sum(different[different > dif_thresh] - dif_thresh)
 
         loss = sim_loss + dif_loss
 
