@@ -69,20 +69,55 @@ class LossC:
         y_true = tf.where(same_obj, 1, -1)
         return y_true
 
-    def _resolve_labels(self, y_true, y_pred):
-        y_pred    = np.array(y_pred)
-        y_true    = np.array(y_true)
-        unique    = np.unique(y_pred)
-        labels    = np.zeros_like(y_pred)
+    # def _resolve_labels(self, y_true, y_pred):
+    #     y_pred    = np.array(y_pred)
+    #     y_true    = np.array(y_true)
+    #     unique    = np.unique(y_pred)
+    #     labels    = np.zeros_like(y_pred)
     
-        for u in unique:
-            mask = y_pred == u
+    #     for u in unique:
+    #         mask = y_pred == u
     
-            mode = statistics.mode(y_true[mask])
+    #         mode = statistics.mode(y_true[mask])
             
-            labels[mask] =  mode
+    #         labels[mask] =  mode
     
-        return labels
+    #     return labels
+
+    def _unique_ordered(self, array):
+        'returns unique elements, ordered from most common to least'
+        array = np.array(array)
+    
+        unique, counts = np.unique(array, return_counts=True)
+    
+        ordered_index = np.argsort(-counts)
+    
+        return unique[ordered_index]
+
+    def _resolve_labels(self, y_true, y_pred):
+        'resolves y_pred to choose same labeling scheme as y_true, with no match = -1'
+        y_pred     = np.array(y_pred)
+        y_true     = np.array(y_true)
+        y_resolved = np.full(y_pred.shape, -1)
+        
+        y_true_uni_ord = self._unique_ordered(y_true)
+        used = set()
+    
+        for u in y_true_uni_ord:
+            y_pred_subset = y_pred[y_true == u]
+    
+            y_pred_sub_uni_ord = self._unique_ordered(y_pred_subset)
+    
+            for unique_pred in y_pred_sub_uni_ord:
+                if unique_pred not in used:
+                    used.add(unique_pred)
+    
+                    correct = (y_true == u) & (y_pred == unique_pred)
+            
+                    y_resolved[correct] = u
+                    break
+    
+        return y_resolved
     
     def _get_accuracy(self, y_true_labels, y_pred_labels):
         y_pred_labels = self._resolve_labels(y_true_labels, y_pred_labels)
