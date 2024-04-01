@@ -3,16 +3,13 @@ import numpy as np
 import statistics
 from .decode import decode_to_labels
 
-
-# +
 # ########
 # siamese_model = SiameseModel()
 # clips_data    = tf.random.uniform([10, 32, 40, 3])
 # coords_data   = tf.random.uniform([10, 4  ])
-# labels_data   = tf.convert_to_tensor([1., 2., 3., 1., 2., 3., 1., 2., 3., 4.])
+labels   = tf.convert_to_tensor([1., 2., 3., 1., 2., 3., 1., 2., 3., 4.])
 # model_out     = siamese_model.model([clips_data, coords_data])
 # ########
-# -
 
 class LossC:
     'Siamese network loss using cosine similarity'
@@ -130,6 +127,44 @@ class LossC:
         y_pred = tf.reshape(y_pred, [-1])
 
         loss   = tf.keras.losses.mean_squared_error(y_true, y_pred)
+
+        loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
+
+        ##### ACCURACY #####
+
+        y_true_labels = labels
+        y_pred_labels = decode_to_labels(model_output, **decode_params)
+               
+        accuracy = self._get_accuracy(y_true_labels, y_pred_labels)        
+        accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
+               
+        return loss
+        
+
+    def calc_loss_with_margin(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
+        '''
+        Calculates loss for siamese network
+
+        Args:
+            model_output (tensor) : shape (n_obj, encoding_depth)
+            labels       (tensor) : shape (n_obj,)
+
+        Returns:
+            loss (tensor) : single scalar loss value
+        
+        '''
+        margin = .7
+        
+        same_obj    = self._label_mask(labels)                 # [n_labels, n_labels] bool
+        cos_sim_mat = self._cosine_similiarty(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
+
+        similar   = cos_sim_mat[same_obj]
+        different = cos_sim_mat[~same_obj]
+        
+        sim_loss = tf.reduce_sum(margin - similar[similar < margin])
+        dif_loss = tf.reduce_sum(different[different > margin] - margin)
+
+        loss = sim_loss + dif_loss
 
         loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
 
@@ -279,3 +314,24 @@ class LossE:
         accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
                
         return loss
+
+
+loss = LossC()
+
+mask = loss._label_mask(labels)
+
+# +
+a = tf.convert_to_tensor([.3, .5, .7])
+b = tf.convert_to_tensor([.7, .5, .3])
+c = tf.convert_to_tensor([.1, .9, .1])
+
+t0 = tf.stack([a,b,c,a,b,c,a,b,c,a], axis=0)
+
+y_pred = loss._cosine_similiarty(t0)
+# -
+
+not_sim = y_pred[~mask]
+
+not_sim[not_sim < .7]
+
+

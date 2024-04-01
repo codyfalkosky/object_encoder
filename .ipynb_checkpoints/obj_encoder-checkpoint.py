@@ -8,13 +8,17 @@ from .decode import decode_to_labels
 
 class ObjectEncoder:
     def __init__(self, train_data_paths=None, valid_data_paths=None, loss='cosine',
-                load_weights=None, verbose=0):
+                load_weights=None, with_margin=None, verbose=0):
         
         # two alternate styles of calculating loss are possible
         self.loss_style = loss
         if loss == 'cosine':
             self.loss_obj = LossC()
-            self.loss     = self.loss_obj.calc_loss
+
+            if with_margin:
+                self.loss     = self.loss_obj.calc_loss_with_margin
+            else:
+                self.loss     = self.loss_obj.calc_loss
         elif loss == 'euclidian':
             self.loss_obj     = LossE()
             self.loss         = self.loss_obj.calc_loss
