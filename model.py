@@ -10,9 +10,9 @@ class ObjEncoder:
     '''
 
     def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1):
-        self.model = self._build_model()
+        self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined)
 
-    def _build_model(self):
+    def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined):
         '''
         Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
         and returning a vector of depth 256 encoding the image
