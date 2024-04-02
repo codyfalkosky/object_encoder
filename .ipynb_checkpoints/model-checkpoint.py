@@ -112,13 +112,13 @@ class ObjEncoderV2:
         >>> model = ObjectEncoder().model
     '''
 
-    def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1, beta_em=1):
+    def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1, beta_em=1, dropout_rate=0):
         '''
         Returns Object Encoder model at self.model
         '''
-        self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined, beta_em)
+        self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined, beta_em, dropout_rate)
 
-    def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined, beta_em):
+    def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined, beta_em, dropout_rate):
         '''
         Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
         and returning a vector of depth 256 encoding the image
@@ -132,9 +132,11 @@ class ObjEncoderV2:
         # Block 1
         if 'clip_block_1' not in omit_structure:
             x = Conv2D(64/beta_clips, (3, 3), padding='same', name='clip_block1_1')(x)
+            x = Dropout(dropout_rate)(x)
             x = ReLU(                              name='clip_block1_3')(x)
     
             x = Conv2D(64/beta_clips, (3, 3), padding='same', name='clip_block1_4')(x)
+            x = Dropout(dropout_rate)(x)
             x = ReLU(                              name='clip_block1_6')(x)
 
             x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
@@ -142,9 +144,11 @@ class ObjEncoderV2:
         # Block 2
         if 'clip_block_2' not in omit_structure:
             x = Conv2D(128/beta_clips,(3, 3), padding='same', name='clip_block2_1')(x)
+            x = Dropout(dropout_rate)(x)
             x = ReLU(                              name='clip_block2_3')(x)
     
             x = Conv2D(128/beta_clips,(3, 3), padding='same', name='clip_block2_4')(x)
+            x = Dropout(dropout_rate)(x)
             x = ReLU(                              name='clip_block2_6')(x)
     
             x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
@@ -152,6 +156,7 @@ class ObjEncoderV2:
         # Block 3
         if 'clip_block_3' not in omit_structure:
             x = Conv2D(256/beta_clips,(3, 3), padding='same', name='clip_block3_1')(x)
+            x = Dropout(dropout_rate)(x)
             x = ReLU(                              name='clip_block3_3')(x)
     
             x = Conv2D(256/beta_clips,(3, 3), padding='same', name='clip_block3_4')(x)

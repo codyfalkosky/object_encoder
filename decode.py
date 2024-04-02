@@ -22,6 +22,27 @@ def _cosine_similiarty_np(x):
 
     return sim_matrix
 
+def _euclidean_distance(self, x):
+    
+    '||p - q||^2 = ||p||^2 + ||q||^2 - 2 * p dot q.T '
+    
+    # compute parts
+    squared_norms = tf.reduce_sum(tf.square(x), axis=1)
+
+    p_sn = tf.reshape(squared_norms, [-1, 1])
+    q_sn = tf.reshape(squared_norms, [1 ,-1])
+
+    # ||p||^2 + ||q||^2 - 2 * p * q.T
+    squared_distance = (p_sn + q_sn) - 2 * tf.matmul(x, x, transpose_b=True)
+
+    # clip for floating point stability
+    squared_distance = tf.maximum(squared_distance, 0.)
+
+    # square root for distance
+    distance = tf.sqrt(squared_distance)
+
+    return dist_matrix
+
 def _as_nodes(edges):
     '''
     convert list of pairs to a "graph" of "nodes" and "connections" represented with a dictionary
@@ -195,7 +216,7 @@ def _node_sets_to_labels(node_sets, nodes):
 
 # -
 
-def decode_to_labels(model_output, similarity_threshold=.99, percentile=.3):
+def decode_to_labels(model_output, similarity_threshold=.99, percentile=.3, decode_basis='cosine', euclidean_thresh=.5):
     '''
     decodes object_encoder model_output to labels
 
@@ -206,9 +227,12 @@ def decode_to_labels(model_output, similarity_threshold=.99, percentile=.3):
     Return:
         labels (list) : every vector labeled by cluster
     '''
-
-    sim_matrix = _cosine_similiarty_np(model_output)
-    graph      = _as_nodes(np.argwhere(sim_matrix > similarity_threshold))
+    if decode_basis == 'cosine':
+        sim_matrix = _cosine_similiarty_np(model_output)
+        graph      = _as_nodes(np.argwhere(sim_matrix > similarity_threshold))
+    elif decode_basis == 'euclidean':
+        dist_matrix= _euclidean_distance(model_output)
+        graph      = _as_nodes(np.argwhere(dist_matrix < euclidean_thresh))
     nodes      = _sort_nodes(graph)
     node_sets  = _extract_node_sets(graph, nodes, percentile)
     labels     = _node_sets_to_labels(node_sets, nodes)

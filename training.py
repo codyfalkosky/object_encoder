@@ -147,7 +147,8 @@ class Training:
             pickle.dump(history, file)
 
 
-    def fit(self, optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile):
+    def fit(self, optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile
+           decode_basis, euclidean_thresh):
         '''
         basic fit function for object encoder
 
@@ -162,7 +163,8 @@ class Training:
         if optimizer:
             self.optimizer = optimizer
 
-        decode_params = {'similarity_threshold' : similarity_threshold, 'percentile': percentile}
+        decode_params = {'similarity_threshold' : similarity_threshold, 'percentile': percentile,
+                         'decode_basis': decode_basis, 'euclidean_thresh':euclidean_thresh}
 
         print('Loading Training Data')
         train_data_len = 0

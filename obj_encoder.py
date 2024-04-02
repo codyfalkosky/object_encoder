@@ -46,6 +46,8 @@ class ObjectEncoder:
                 beta_combined: int
                     factor to divide number of neurons in final dense
                     1 = no change
+                dropout_rate: float
+                    dropout rate during training
                 
         '''
         
@@ -82,7 +84,8 @@ class ObjectEncoder:
         # load training loops
         self.training = Training(self)
 
-    def fit(self, optimizer=None, save_best_folder=None, save_below=None, epochs=None, similarity_threshold=.99, percentile=.3):
+    def fit(self, optimizer=None, save_best_folder=None, save_below=None, epochs=None, 
+            similarity_threshold=.99, percentile=.3, decode_basis='cosine', euclidean_thresh=.5
         '''
         top level fit function, to be called directally when training
 
@@ -106,7 +109,8 @@ class ObjectEncoder:
         Returns:
             trained model at self.model            
         '''
-        self.training.fit(optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile)
+        self.training.fit(optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile,
+                         decode_basis='cosine', euclidean_thresh=.5)
 
     def label(self, model_inputs, **kwargs):
         '''
