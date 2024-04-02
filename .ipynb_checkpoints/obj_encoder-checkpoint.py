@@ -85,7 +85,7 @@ class ObjectEncoder:
         self.training = Training(self)
 
     def fit(self, optimizer=None, save_best_folder=None, save_below=None, epochs=None, 
-            similarity_threshold=.99, percentile=.3, decode_basis='cosine', euclidean_thresh=.5)
+            similarity_threshold=.99, percentile=.3, decode_basis='cosine', euclidean_thresh=.5):
         '''
         top level fit function, to be called directally when training
 
