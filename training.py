@@ -147,7 +147,7 @@ class Training:
             pickle.dump(history, file)
 
 
-    def fit(self, optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile
+    def fit(self, optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile,
            decode_basis, euclidean_thresh):
         '''
         basic fit function for object encoder
