@@ -221,11 +221,22 @@ class LossC:
         similar   = cos_sim_mat[same_obj]
         different = cos_sim_mat[~same_obj]
         
-        sim_loss = tf.reduce_sum(sim_thresh - similar[similar < sim_thresh])
-        dif_loss = tf.reduce_sum(different[different > dif_thresh] - dif_thresh)
+        # sim_loss = tf.reduce_sum(sim_thresh - similar[similar < sim_thresh])
+        # dif_loss = tf.reduce_sum(different[different > dif_thresh] - dif_thresh)
 
-        loss = sim_loss + dif_loss
+        # loss = sim_loss + dif_loss
 
+        sim_loss = sim_thresh - similar[similar < sim_thresh]
+        dif_loss = different[different > dif_thresh] - dif_thresh
+
+        y_pred = tf.concat([sim_loss, dif_loss], axis=-1)
+        y_pred = tf.reshape(y_pred, [-1])
+        
+        y_true = tf.zeros_like(y_pred)
+
+        loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
+
+        
         loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
 
         ##### ACCURACY #####
