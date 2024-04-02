@@ -165,27 +165,25 @@ class DataBuilder:
         return example
 
 
-save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Valid/obj_encoder_valid_2.tfr'
-
-# +
-writer = tf.io.TFRecordWriter(save_file)
-
-print('Serializing Data')
-
-distortion = {
-    'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
-    'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
-}
-
-for folder in tqdm(seq_folders):
-
-    data    = DataBuilder(folder, distortion=distortion)
-    example = data.serialize()
-
-    writer.write(example)
-
-writer.close()
-# -
+if __name__ == '__main__':
+    save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Valid/obj_encoder_valid_7.tfr'
+    writer = tf.io.TFRecordWriter(save_file)
+    
+    print('Serializing Data')
+    
+    # distortion = {
+    #     'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
+    #     'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
+    # }
+    
+    for folder in tqdm(seq_folders):
+    
+        data    = DataBuilder(folder)
+        example = data.serialize()
+    
+        writer.write(example)
+    
+    writer.close()
 # ## SHOW EXTRACTIONS
 
 # +

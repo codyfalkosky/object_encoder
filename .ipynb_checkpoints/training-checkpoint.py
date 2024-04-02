@@ -78,12 +78,12 @@ class Training:
             model saved to save_best_folder/yolov2_model_{str_loss}.h5"
         '''
 
-        if save_best_folder:
-            if self.valid_loss[-1] == min(self.valid_loss):
-                if self.valid_loss[-1] < save_below:
-                    str_loss = f"{self.valid_loss[-1]:.5f}"
-                    str_loss = str_loss.replace('.', '')
-                    self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.weights.h5")
+
+        if self.valid_loss[-1] == min(self.valid_loss):
+            if self.valid_loss[-1] < save_below:
+                str_loss = f"{self.valid_loss[-1]:.5f}"
+                str_loss = str_loss.replace('.', '')
+                self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.weights.h5")
 
     def save_history(self, run, save_dir):
         history = {'train loss'    : self.train_loss,
@@ -109,7 +109,8 @@ class Training:
 
         This function is meant to be called by the parent_obj's fit method
         '''
-        self.optimizer = optimizer
+        if optimizer:
+            self.optimizer = optimizer
 
         decode_params = {'similarity_threshold' : similarity_threshold, 'percentile': percentile}
 
@@ -150,7 +151,8 @@ class Training:
             self.valid_accuracy_metric.reset_state()
 
             # save if best
-            self.save_best(save_best_folder, save_below)
+            if save_best_folder:
+                self.save_best(save_best_folder, save_below)
 
             # show loss
             self.plot_loss()

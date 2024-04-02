@@ -9,7 +9,7 @@ class ObjEncoder:
         >>> model = ObjectEncoder().model
     '''
 
-    def __init__(self):
+    def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1):
         self.model = self._build_model()
 
     def _build_model(self):
@@ -21,68 +21,80 @@ class ObjEncoder:
         clips_in = Input([32, 40, 3], name='clips_input')
 
         ######## CLIP STAGE ########
-
+        x = clips_in
+        
         # Block 1
-        x = Conv2D(64, (3, 3), padding='same', name='clip_block1_1')(clips_in)
-        x = BatchNormalization(                name='clip_block1_2')(x)
-        x = ReLU(                              name='clip_block1_3')(x)
+        if 'clip_block_1' not in omit_structure:
+            x = Conv2D(64/beta_clips, (3, 3), padding='same', name='clip_block1_1')(x)
+            x = BatchNormalization(                name='clip_block1_2')(x)
+            x = ReLU(                              name='clip_block1_3')(x)
+    
+            x = Conv2D(64/beta_clips, (3, 3), padding='same', name='clip_block1_4')(x)
+            x = BatchNormalization(                name='clip_block1_5')(x)
+            x = ReLU(                              name='clip_block1_6')(x)
 
-        x = Conv2D(64, (3, 3), padding='same', name='clip_block1_4')(x)
-        x = BatchNormalization(                name='clip_block1_5')(x)
-        x = ReLU(                              name='clip_block1_6')(x)
-
-        x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
+            x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
 
         # Block 2
-        x = Conv2D(128,(3, 3), padding='same', name='clip_block2_1')(x)
-        x = BatchNormalization(                name='clip_block2_2')(x)
-        x = ReLU(                              name='clip_block2_3')(x)
-
-        x = Conv2D(128,(3, 3), padding='same', name='clip_block2_4')(x)
-        x = BatchNormalization(                name='clip_block2_5')(x)
-        x = ReLU(                              name='clip_block2_6')(x)
-
-        x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
+        if 'clip_block_2' not in omit_structure:
+            x = Conv2D(128/beta_clips,(3, 3), padding='same', name='clip_block2_1')(x)
+            x = BatchNormalization(                name='clip_block2_2')(x)
+            x = ReLU(                              name='clip_block2_3')(x)
+    
+            x = Conv2D(128/beta_clips,(3, 3), padding='same', name='clip_block2_4')(x)
+            x = BatchNormalization(                name='clip_block2_5')(x)
+            x = ReLU(                              name='clip_block2_6')(x)
+    
+            x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
 
         # Block 3
-        x = Conv2D(256,(3, 3), padding='same', name='clip_block3_1')(x)
-        x = BatchNormalization(                name='clip_block3_2')(x)
-        x = ReLU(                              name='clip_block3_3')(x)
-
-        x = Conv2D(256,(3, 3), padding='same', name='clip_block3_4')(x)
-        x = BatchNormalization(                name='clip_block3_5')(x)
-        x = ReLU(                              name='clip_block3_6')(x)
-
-        x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
+        if 'clip_block_3' not in omit_structure:
+            x = Conv2D(256/beta_clips,(3, 3), padding='same', name='clip_block3_1')(x)
+            x = BatchNormalization(                name='clip_block3_2')(x)
+            x = ReLU(                              name='clip_block3_3')(x)
+    
+            x = Conv2D(256/beta_clips,(3, 3), padding='same', name='clip_block3_4')(x)
+            x = BatchNormalization(                name='clip_block3_5')(x)
+            x = ReLU(                              name='clip_block3_6')(x)
+    
+            x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
+        
         clips_out = Flatten()(x)
 
         ######## COORDS STAGE ########
 
         coords_in = Input([4], name='coords_input')
 
+        x = coords_in
         # Block 1
-        x = Dense(32,          name='coords_block1_1')(coords_in)
-        x = BatchNormalization(name='coords_block1_2')(x)
-        x = ReLU(              name='coords_block1_3')(x)
+        if 'coords_block_1' not in omit_structure:
+            x = Dense(32/beta_coords,          name='coords_block1_1')(x)
+            x = BatchNormalization(name='coords_block1_2')(x)
+            x = ReLU(              name='coords_block1_3')(x)
 
         # Block 2
-        x = Dense(64,          name='coords_block2_4')(x)
-        x = BatchNormalization(name='coords_block2_5')(x)
-        coords_out = ReLU(     name='coords_block2_6')(x)
+        if 'coords_block_2' not in omit_structure:
+            x = Dense(64/beta_coords,          name='coords_block2_4')(x)
+            x = BatchNormalization(name='coords_block2_5')(x)
+            x = ReLU(              name='coords_block2_6')(x)
+
+        coords_out = x
 
         ######## COMBINED STAGE ########
         
         x = Concatenate(       name='concatenate')([coords_out, clips_out])
 
         # Block 1
-        x = Dense(1024,        name='combined_block1_1')(x)
-        x = BatchNormalization(name='combined_block1_2')(x)
-        x = ReLU(              name='combined_block1_3')(x)
+        if 'combined_block_1' not in omit_structure:
+            x = Dense(1024/beta_combined,        name='combined_block1_1')(x)
+            x = BatchNormalization(name='combined_block1_2')(x)
+            x = ReLU(              name='combined_block1_3')(x)
 
         # Block 2
-        x = Dense(512,         name='combined_block2_4')(x)
-        x = BatchNormalization(name='combined_block2_5')(x)
-        x = ReLU(              name='combined_block2_6')(x)
+        if 'combined_block_2' not in omit_structure:
+            x = Dense(512/beta_combined,         name='combined_block2_4')(x)
+            x = BatchNormalization(name='combined_block2_5')(x)
+            x = ReLU(              name='combined_block2_6')(x)
 
         x = Dense(256,         name='output')(x)        
 

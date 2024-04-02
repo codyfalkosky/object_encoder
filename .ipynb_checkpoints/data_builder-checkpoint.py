@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from boxes import Boxes
 from IPython.display import clear_output
 from tqdm.notebook import tqdm
-tf.keras.utils.set_random_seed(1)
+tf.keras.utils.set_random_seed(2)
 tf.config.experimental.enable_op_determinism()
 
-parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Train/*'
+parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Valid/*'
 seq_folders = glob.glob(parent_glob)
 
 
@@ -165,27 +165,25 @@ class DataBuilder:
         return example
 
 
-save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Train/obj_encoder_train_1.tfr'
-
-# +
-writer = tf.io.TFRecordWriter(save_file)
-
-print('Serializing Data')
-
-distortion = {
-    'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
-    'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
-}
-
-for folder in tqdm(seq_folders):
-
-    data    = DataBuilder(folder, distortion=distortion)
-    example = data.serialize()
-
-    writer.write(example)
-
-writer.close()
-# -
+if __name__ == '__main__':
+    save_file = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/TFRecords_Valid/obj_encoder_valid_7.tfr'
+    writer = tf.io.TFRecordWriter(save_file)
+    
+    print('Serializing Data')
+    
+    # distortion = {
+    #     'x_min': .96, 'x_max': 1.04,  'y_min':.96, 'y_max':1.04,
+    #     'h_min':  1,  'h_max': 1.4,   'w_min': 1,  'w_max':1.4
+    # }
+    
+    for folder in tqdm(seq_folders):
+    
+        data    = DataBuilder(folder)
+        example = data.serialize()
+    
+        writer.write(example)
+    
+    writer.close()
 # ## SHOW EXTRACTIONS
 
 # +
