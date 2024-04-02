@@ -9,7 +9,7 @@ from tqdm.notebook import tqdm
 tf.keras.utils.set_random_seed(2)
 tf.config.experimental.enable_op_determinism()
 
-parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_Valid/*'
+parent_glob = '/Users/codyfalkosky/Desktop/Obj_Encoder_Data/Obj_Encoder_Data_New/*'
 seq_folders = glob.glob(parent_glob)
 
 

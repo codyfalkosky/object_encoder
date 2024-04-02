@@ -9,13 +9,13 @@ class ObjEncoder:
         >>> model = ObjectEncoder().model
     '''
 
-    def __init__(self, architecture='MODEL1'):
+    def __init__(self, architecture='MODEL1', model_params={}):
         '''
         Returns Object Encoder model at self.model
         '''
-        self.model = self._build_model(architecture)
+        self.model = self._build_model(architecture, model_params)
 
-    def _build_model(self, architecture):
+    def _build_model(self, architecture, model_params):
         if architecture == 'MODEL1':
             '''
             Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
@@ -135,7 +135,6 @@ class ObjEncoder:
             x = coords_in
             # Block 1
             x = Dense(16,          name='coords_block1_1')(x)
-            x = BatchNormalization(name='coords_block1_2')(x)
             x = ReLU(              name='coords_block1_3')(x)
     
             coords_out = x
@@ -146,7 +145,6 @@ class ObjEncoder:
     
             # Block 1
             x = Dense(32,          name='combined_block1_1')(x)
-            x = BatchNormalization(name='combined_block1_2')(x)
             x = ReLU(              name='combined_block1_3')(x)
 
     
@@ -190,7 +188,6 @@ class ObjEncoder:
             x = coords_in
             # Block 1
             x = Dense(8,          name='coords_block1_1')(x)
-            x = BatchNormalization(name='coords_block1_2')(x)
             x = ReLU(              name='coords_block1_3')(x)
     
             coords_out = x
@@ -201,7 +198,6 @@ class ObjEncoder:
     
             # Block 1
             x = Dense(16,          name='combined_block1_1')(x)
-            x = BatchNormalization(name='combined_block1_2')(x)
             x = ReLU(              name='combined_block1_3')(x)
 
     
