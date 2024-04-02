@@ -1,7 +1,7 @@
 import tensorflow as tf
 from .data import Data
 from .loss import LossC, LossE
-from .model import ObjEncoderV2
+from .model import ObjEncoder
 from .training import Training
 from .decode import decode_to_labels
 
@@ -57,7 +57,7 @@ class ObjectEncoder:
             self.dataset['valid']  = Data(valid_data_paths).dataset
 
         # initalize model
-        self.model    = ObjEncoderV2(architecture.model
+        self.model    = ObjEncoder(architecture).model
 
         if load_weights:
             self.model.load_weights(load_weights)
