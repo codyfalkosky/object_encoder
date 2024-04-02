@@ -12,11 +12,19 @@ labels   = tf.convert_to_tensor([1., 2., 3., 1., 2., 3., 1., 2., 3., 4.])
 # ########
 
 class LossC:
-    'Siamese network loss using cosine similarity'
+    'Object Encoder loss using cosine similarity'
 
     def _cosine_similiarty(self, x):
         '''
         given a matrix a, computes cosine similarity of all vectors in a to all other vectors in a
+
+        Args:
+            x: tensor [b, encodings]
+                the output of the object encoding model
+        Returns:
+            sim_matrix: tensor [b, b]
+                cosine_similarity of all vectors to all other vectors
+        
         '''
         
         # normalize all vectors to magnitude 1
@@ -33,11 +41,14 @@ class LossC:
         generates mask for all unique objects
 
         Args:
-            labels (tensor) : shape (n_obj,)
+            labels: tensor
+                shape (n_obj,)
         Returns:
-            same_obj (tensor) : bool shape [n_labels, is_label, matches]
+            same_obj: tensor
+                bool shape [n_labels, is_label, matches]
                 for comparing an object to all the other versions of itself
-            diff_obj (tensor) : bool shape [n_labels, is_label, not_matches]
+            diff_obj: tensor
+                bool shape [n_labels, is_label, not_matches]
                 for compaering an object to everything that it isn't
         '''
         y, idx   = tf.unique(labels)
@@ -54,9 +65,11 @@ class LossC:
         calculates perfect score similary matrix for loss
         
         Args:
-            labels (tensor) : shape (n_obj,)
+            labels: tensor
+                shape (n_obj,)
         Returns:
-            y_true (tensor) : shape (n_obj, n_obj)
+            y_true: tensor
+                shape (n_obj, n_obj)
                 same shape as the cosine similarity matrix 
         
         '''
@@ -67,17 +80,50 @@ class LossC:
         return y_true
 
     def _unique_ordered(self, array):
-        'returns unique elements, ordered from most common to least'
+        '''
+        returns unique elements, ordered from most common to least
+
+        Args:
+            array: np.array
+                1d array like [1., 2., 3., 3., 2., ...]
+        Returns:
+            ordered_unique: np.array
+                1d array of all unique values ordered from most common to least
+            
+        '''
         array = np.array(array)
     
         unique, counts = np.unique(array, return_counts=True)
     
         ordered_index = np.argsort(-counts)
+
+        ordered_unique = unique[ordered_index]
     
-        return unique[ordered_index]
+        return ordered_unique
 
     def _resolve_labels(self, y_true, y_pred):
-        'resolves y_pred to choose same labeling scheme as y_true, with no match = -1'
+        '''
+        resolves y_pred to choose same labeling scheme as y_true, with no match = -1
+
+
+        Args:
+            y_true: tensor
+                true labels
+            y_pred: tensor
+                models predicted labels
+
+        Returns:
+            y_resolved: array
+                similar to y_pred, but with labels re-named to match y_true if they match
+                for example
+                y_true     = [1, 2, 2, 3, 4]
+                y_pred     = [2, 1, 1, 3, 3]
+                y_resolved = [1, 2, 2, 3, -1]
+
+                since this task is object encoding the label number has no intrinsic meaning
+                only that 1 and 1 are the same object so label 'names' must be adjusted to 
+                true labels
+        '''
         y_pred     = np.array(y_pred)
         y_true     = np.array(y_true)
         y_resolved = np.full(y_pred.shape, -1)
@@ -102,6 +148,19 @@ class LossC:
         return y_resolved
     
     def _get_accuracy(self, y_true_labels, y_pred_labels):
+        '''
+        returns accuracy for and auto resolves labels
+
+        Args:
+            y_true_labels: tensor
+                from training/valid dataset
+            y_pred_labels: tensor
+                output of model.label
+
+        Returns:
+            accuracy: float
+                accuracy between [0, 1]
+        '''
         y_pred_labels = self._resolve_labels(y_true_labels, y_pred_labels)
         
         accuracy = np.array(y_true_labels == y_pred_labels).mean()

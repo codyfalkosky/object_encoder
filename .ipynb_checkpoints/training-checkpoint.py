@@ -25,6 +25,27 @@ class Training:
         self.valid_accuracy_metric = tf.keras.metrics.Mean()
 
     def train_step(self, batch, decode_params):
+        '''
+        basic training step
+
+        Args:
+            batch: iterable of tensors (objects, coords)
+                objects: tensor
+                    shape [b, 32, 40, 3] images of cars
+                coords: tensor
+                    shape [b, 4] cxcywh coords
+            decode_params: dictionary containing
+                similarity_threshold: float
+                    strickly for reporting accuracy, cosine similarity minimum to be considered for label clustering
+                percentile: float
+                    percentile of cluster connection strength to be considered valid connection
+                    read more in function decode_to_labels in decode.py
+
+        Returns:
+            weight updates to model at self.parent_obj.model
+            update to metric for loss 
+            update to metric to accuracy 
+        '''
         with tf.GradientTape() as tape:
             model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=True)
             loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric, decode_params)
@@ -33,13 +54,34 @@ class Training:
         self.optimizer.apply_gradients(zip(gradients, self.parent_obj.model.trainable_variables))
 
     def valid_step(self, batch, decode_params):
+        '''
+        basic valid step
+
+        Args:
+            batch: iterable of tensors (objects, coords)
+                objects: tensor
+                    shape [b, 32, 40, 3] images of cars
+                coords: tensor
+                    shape [b, 4] cxcywh coords
+            decode_params: dictionary containing
+                similarity_threshold: float
+                    strickly for reporting accuracy, cosine similarity minimum to be considered for label clustering
+                percentile: float
+                    percentile of cluster connection strength to be considered valid connection
+                    read more in function decode_to_labels in decode.py
+
+        Returns:
+            weight updates to model at self.parent_obj.model
+            update to metric for loss 
+            update to metric to accuracy 
+        '''
         model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=False)
         loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric, decode_params)
 
     def plot_loss(self):
         '''
         for visualization during training
-        displays train and valid loss
+        displays train and valid loss, and accuracy
         '''
         clear_output(wait=True)
 
@@ -86,6 +128,14 @@ class Training:
                 self.parent_obj.model.save_weights(f"{save_best_folder}/obj_encoder_model_{self.parent_obj.loss_style}_{str_loss}.weights.h5")
 
     def save_history(self, run, save_dir):
+        '''
+        saves training history to save_dir
+
+        run: int or string
+            number to represent training run i.e. run 16
+        save_dir: string path/to/folder
+            history will be saved to this folder
+        '''
         history = {'train loss'    : self.train_loss,
                    'valid loss'    : self.valid_loss,
                    'train accuracy': self.train_accuracy,
@@ -157,7 +207,9 @@ class Training:
             # show loss
             self.plot_loss()
 
-            if len(self.train_accuracy) > epochs:
-                break
+
+            if epochs:
+                if len(self.train_accuracy) > epochs:
+                    break
     
     
