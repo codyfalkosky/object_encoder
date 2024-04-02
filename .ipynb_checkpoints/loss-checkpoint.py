@@ -321,20 +321,20 @@ class LossE:
         used = set()
     
         for u in y_true_uni_ord:
-            print(f'''
-u
---
-{u}
+#             print(f'''
+# u
+# --
+# {u}
 
 
-y_true_uni_ord
---------------
-{y_true_uni_ord}
+# y_true_uni_ord
+# --------------
+# {y_true_uni_ord}
 
-y_pred
-------
-{y_pred}
-            ''')
+# y_pred
+# ------
+# {y_pred}
+#             ''')
             y_pred_subset = y_pred[y_true == u]
     
             y_pred_sub_uni_ord = self._unique_ordered(y_pred_subset)
@@ -405,7 +405,7 @@ y_pred
         dif_thresh = 2
         
         same_obj    = self._label_mask(labels)                       # [n_labels, n_labels] bool
-        euc_dst_mat = self._euclidean_distance_true(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
+        euc_dst_mat = self._euclidean_distance(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
 
         similar   = euc_dst_mat[same_obj]
         different = euc_dst_mat[~same_obj]
