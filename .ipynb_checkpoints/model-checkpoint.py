@@ -9,10 +9,10 @@ class ObjEncoder:
         >>> model = ObjectEncoder().model
     '''
 
-    def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1):
+    def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1, beta_em=1):
         self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined)
 
-    def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined):
+    def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined, beta_em):
         '''
         Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
         and returning a vector of depth 256 encoding the image
@@ -96,7 +96,7 @@ class ObjEncoder:
             x = BatchNormalization(name='combined_block2_5')(x)
             x = ReLU(              name='combined_block2_6')(x)
 
-        x = Dense(256,         name='output')(x)        
+        x = Dense(256/beta_em,         name='output')(x)        
 
         model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
 
