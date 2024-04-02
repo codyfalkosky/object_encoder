@@ -313,6 +313,7 @@ class LossE:
 
     def _resolve_labels(self, y_true, y_pred):
         'resolves y_pred to choose same labeling scheme as y_true, with no match = -1'
+        print(y_pred)
         y_pred     = np.array(y_pred)
         y_true     = np.array(y_true)
         y_resolved = np.full(y_pred.shape, -1)
