@@ -8,7 +8,7 @@ from .decode import decode_to_labels
 
 class ObjectEncoder:
     def __init__(self, train_data_paths=None, valid_data_paths=None, loss='cosine',
-                load_weights=None, with_margin=False, verbose=0, model_params={}):
+                load_weights=None, with_margin=False, verbose=0, architecture='MODEL1'):
         '''
         Top level class for building, training, loading and predicting object encodings
 
@@ -32,22 +32,6 @@ class ObjectEncoder:
                 True uses a margin for which performance beyond is ignored
             verbose: int
                 for debug, 0 to silence all messages
-
-            model_params: dictionary of parametes to limit model size
-                omit_structure: list
-                    corresponing to specific structure components to omit
-                    like ['clip_block_1', ...]
-                beta_clips: int
-                    factor to divide number of neurons in clips conv
-                    1 = no change
-                beta_coords: int
-                    factor to divide number of neurons in coords dense
-                    1 = no change
-                beta_combined: int
-                    factor to divide number of neurons in final dense
-                    1 = no change
-                dropout_rate: float
-                    dropout rate during training
                 
         '''
         
@@ -73,7 +57,7 @@ class ObjectEncoder:
             self.dataset['valid']  = Data(valid_data_paths).dataset
 
         # initalize model
-        self.model    = ObjEncoderV2(**model_params).model
+        self.model    = ObjEncoderV2(architecture.model
 
         if load_weights:
             self.model.load_weights(load_weights)
