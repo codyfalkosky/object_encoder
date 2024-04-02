@@ -156,8 +156,9 @@ class ObjEncoder:
     
             return model
 
-        #### SIMPLE ####
-        ################
+        #################
+        #### SIMPLER ####
+        #################
         
         elif architecture == 'SIMPLER':
             '''
@@ -197,6 +198,51 @@ class ObjEncoder:
             ######## COMBINED STAGE ########
             
             x = Concatenate(       name='concatenate')([coords_out, clips_out])
+    
+            # Block 1
+            x = Dense(16,          name='combined_block1_1')(x)
+            x = BatchNormalization(name='combined_block1_2')(x)
+            x = ReLU(              name='combined_block1_3')(x)
+
+    
+            x = Dense(8,         name='output')(x)        
+    
+            model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
+    
+            return model
+
+        ###################
+        #### CONV ONlY ####
+        ###################
+        
+        elif architecture == 'CONV_ONLY':
+            '''
+            Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
+            and returning a vector of depth 256 encoding the image
+            '''
+    
+            clips_in = Input([32, 40, 3], name='clips_input')
+    
+            ######## CLIP STAGE ########
+            x = clips_in
+            
+            # Block 1   
+            x = Conv2D(16, (8, 10), padding='same', name='clip_block1_1')(x)
+            x = ReLU(                               name='clip_block1_3')(x)    
+            x = MaxPool2D((2, 2), 2,                name='clip_block1_7')(x)
+    
+            # Block 2
+            x = Conv2D(32, (8, 10), padding='same', name='clip_block2_1')(x)
+            x = ReLU(                               name='clip_block2_3')(x)    
+            x = MaxPool2D((2, 2), 2,                name='clip_block2_7')(x)
+            
+            x = Flatten()(x)
+    
+            ######## COORDS STAGE ########
+    
+            coords_in = Input([4], name='coords_input')
+    
+            ######## COMBINED STAGE ########
     
             # Block 1
             x = Dense(16,          name='combined_block1_1')(x)
