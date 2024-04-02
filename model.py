@@ -10,7 +10,7 @@ class ObjEncoder:
     '''
 
     def __init__(self, omit_structure=[], beta_clips=1, beta_coords=1, beta_combined=1, beta_em=1):
-        self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined)
+        self.model = self._build_model(omit_structure, beta_clips, beta_coords, beta_combined, beta_em)
 
     def _build_model(self, omit_structure, beta_clips, beta_coords, beta_combined, beta_em):
         '''
