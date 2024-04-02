@@ -15,7 +15,7 @@ class ObjEncoder:
         '''
         self.model = self._build_model(architecture)
 
-    def _build_model(architecture):
+    def _build_model(self, architecture):
         if architecture == 'MODEL1':
             '''
             Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
