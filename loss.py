@@ -375,6 +375,44 @@ class LossE:
                
         return loss
 
+    def calc_loss_with_margin(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
+        '''
+        Calculates loss for siamese network
+
+        Args:
+            model_output (tensor) : shape (n_obj, encoding_depth)
+            labels       (tensor) : shape (n_obj,)
+
+        Returns:
+            loss (tensor) : single scalar loss value
+        
+        '''
+        sim_thresh = .5
+        dif_thresh = 2
+        
+        same_obj    = self._label_mask(labels)                       # [n_labels, n_labels] bool
+        euc_dst_mat = self._euclidean_distance_true(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
+
+        similar   = euc_dst_mat[same_obj]
+        different = euc_dst_mat[~same_obj]
+        
+        sim_loss = tf.reduce_sum(similar[similar > sim_thresh] - sim_thresh)
+        dif_loss = tf.reduce_sum(dif_thresh - different[different < dif_thresh])
+
+        loss = sim_loss + dif_loss
+
+        loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
+
+        ##### ACCURACY #####
+
+        y_true_labels = labels
+        y_pred_labels = decode_to_labels(model_output, **decode_params)
+               
+        accuracy = self._get_accuracy(y_true_labels, y_pred_labels)        
+        accuracy_metric.update_state(accuracy, sample_weight=y_pred.shape[0])
+               
+        return loss
+
 
 loss = LossC()
 
