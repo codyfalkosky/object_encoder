@@ -48,8 +48,6 @@ class Training:
         '''
         with tf.GradientTape() as tape:
             model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=True)
-            print(batch['objects'])
-            print(model_out)
             loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric, decode_params)
 
         gradients = tape.gradient(loss, self.parent_obj.model.trainable_variables)
