@@ -51,6 +51,7 @@ class ObjectEncoder:
         
         # two alternate styles of calculating loss are possible
         self.loss_style = loss
+        self.verbose = verbose
         if loss == 'cosine':
             self.loss_obj = LossC()
 
@@ -74,7 +75,7 @@ class ObjectEncoder:
 
         if load_weights:
             self.model.load_weights(load_weights)
-            if verbose > 0:
+            if self.verbose > 0:
                 print(f'loaded weights at {load_weights}')
             
 

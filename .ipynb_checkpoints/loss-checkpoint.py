@@ -321,6 +321,20 @@ class LossE:
         used = set()
     
         for u in y_true_uni_ord:
+            print(f'''
+u
+--
+{u}
+
+
+y_true_uni_ord
+--------------
+{y_true_uni_ord}
+
+y_pred
+------
+{y_pred}
+            ''')
             y_pred_subset = y_pred[y_true == u]
     
             y_pred_sub_uni_ord = self._unique_ordered(y_pred_subset)
