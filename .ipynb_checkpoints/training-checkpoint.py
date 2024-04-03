@@ -197,12 +197,15 @@ class Training:
             self.parent_obj.loss_obj.train_cos_sim = []
             self.parent_obj.loss_obj.valid_cos_sim = []
         
-            print(f'Training Epoch: {len(self.train_loss)}')
-            for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
+            # print(f'Training Epoch: {len(self.train_loss)}')
+            print(f'{len(self.train_loss)}')
+            # for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
+            for batch in self.parent_obj.dataset['train']:
                 self.train_step(batch, decode_params)
 
-            print('Validation Epoch:')
-            for batch in tqdm(self.parent_obj.dataset['valid'], total=valid_data_len):
+            # print('Validation Epoch:')
+            # for batch in tqdm(self.parent_obj.dataset['valid'], total=valid_data_len):
+            for batch in self.parent_obj.dataset['valid']:
                 self.valid_step(batch, decode_params)
 
             # record and reset train loss metric
