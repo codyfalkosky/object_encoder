@@ -116,12 +116,14 @@ class Training:
 
         t_len = len(self.parent_obj.loss_obj.train_cos_sim)
         v_len = len(self.parent_obj.loss_obj.valid_cos_sim)
-        
+
+        plt.title('Embedding Vectors: cos_sim')
         plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color='C0', marker='.', alpha=.5, s=1)
         plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color='C1', marker='.', alpha=.5, s=1)
         plt.ylim([-1, 1])
         plt.xticks([])        
         plt.show()
+        # plt.savefig(f'/Users/codyfalkosky/Desktop/progress/fig_{self.optimizer.iterations.numpy()}.png')
 
     def save_best(self, save_best_folder, save_below):
         '''

@@ -53,8 +53,14 @@ class ObjectEncoder:
         self.dataset  = {}
         if train_data_paths:
             self.dataset['train']  = Data(train_data_paths).dataset
+        else:
+            self.dataset['train']  = []
+
+        
         if valid_data_paths:
             self.dataset['valid']  = Data(valid_data_paths).dataset
+        else:
+            self.dataset['valid']  = []
 
         # initalize model
         self.model    = ObjEncoder(architecture).model

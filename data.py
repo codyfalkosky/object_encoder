@@ -51,7 +51,7 @@ class Data:
         self.dataset = tf.data.TFRecordDataset(self.records_path_list)
         self.dataset = self.dataset.map(self.parse_tfrecord_fn)
         self.dataset = self.dataset.cache()
-        self.dataset = self.dataset.shuffle(buffer_size=1024)
+        # self.dataset = self.dataset.shuffle(buffer_size=1024)
         
 
 

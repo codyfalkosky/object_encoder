@@ -172,7 +172,7 @@ class LossC:
     
         return accuracy
         
-    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
+    def calc_loss(self, model_output, labels, loss_metric, accuracy_metric, decode_params, for_):
         '''
         Calculates loss for siamese network
 
@@ -189,6 +189,11 @@ class LossC:
         
         y_pred = self._cosine_similiarty(model_output)
         y_pred = tf.reshape(y_pred, [-1])
+
+        if for_ == 'train':
+            self.train_cos_sim.extend(y_pred.numpy().ravel().tolist())
+        elif for_ == 'valid':
+            self.valid_cos_sim.extend(y_pred.numpy().ravel().tolist())
 
         loss   = tf.keras.losses.mean_squared_error(y_true, y_pred)
 
