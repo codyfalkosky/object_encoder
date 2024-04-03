@@ -235,6 +235,39 @@ class LossC:
         y_true = tf.zeros_like(y_pred)
 
         loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
+        print(loss)
+
+        if (np.nan == loss):
+            print(f'''WHOOPS!
+similar
+-------
+{similar}
+
+different
+---------
+{different}
+
+sim_loss
+--------
+{sim_loss}
+
+dif_loss
+--------
+{dif_loss}
+
+y_pred
+------
+{y_pred}
+
+y_true
+------
+{y_true}
+
+loss
+----
+{loss}
+
+''')
 
         
         loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
