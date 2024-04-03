@@ -226,7 +226,8 @@ class Training:
                 self.save_best(save_best_folder, save_below)
 
             # show loss
-            self.plot_loss()
+            if len(self.train_loss) % 20 == 0:
+                self.plot_loss()
 
 
             if epochs:
