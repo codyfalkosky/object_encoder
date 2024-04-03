@@ -238,6 +238,7 @@ class LossC:
         print(loss)
 
         if tf.reduce_any(tf.math.is_nan(loss)):
+            loss = tf.convert_to_tensor(0.0)
             print(f'''WHOOPS!
 labels
 ------
@@ -506,4 +507,35 @@ nan
 
 np.isnan(nan)
 
+t0 = tf.convert_to_tensor([1.,        1.,        0.9999999, 0.9999999, 1.0000001])
 
+t0
+
+# +
+similar = np.array(tf.convert_to_tensor([1.,        1.,        0.9999999, 0.9999999, 1.0000001]))
+
+different = np.array(tf.convert_to_tensor([ 0.37228787,  0.31530547,  0.10026056,  0.2721629,   0.37228787,  0.10503945,
+  0.3871888,  -0.07783314,  0.31530547,  0.10503945,  0.29971948,  0.06790262,
+  0.10026056,  0.3871888,   0.29971948,  0.1196104,   0.2721629,  -0.07783314,
+  0.06790262,  0.1196104 ]))
+
+sim_thresh = .7
+dif_thresh = .5
+# -
+
+sim_loss = sim_thresh - similar[similar < sim_thresh]
+print(np.array(sim_loss))
+
+dif_loss = different[different > dif_thresh] - dif_thresh
+dif_loss
+
+# +
+y_pred = tf.concat([sim_loss, dif_loss], axis=-1)
+y_pred = tf.reshape(y_pred, [-1])
+y_pred
+
+y_true = tf.zeros_like(y_pred)
+y_true
+
+loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
+loss
