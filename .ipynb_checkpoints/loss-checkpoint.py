@@ -214,8 +214,8 @@ class LossC:
             loss (tensor) : single scalar loss value
         
         '''
-        sim_thresh = .95
-        dif_thresh = .5
+        sim_thresh = self.sim_thresh
+        dif_thresh = self.dif_thresh
         
         same_obj    = self._label_mask(labels)                 # [n_labels, n_labels] bool
         cos_sim_mat = self._cosine_similiarty(model_output)    # [n_emb, n_emb] same shape as [n_labels, n_labels]
