@@ -239,6 +239,11 @@ class LossC:
 
         if tf.reduce_any(tf.math.is_nan(loss)):
             print(f'''WHOOPS!
+labels
+------
+{labels}
+
+
 similar
 -------
 {similar}
