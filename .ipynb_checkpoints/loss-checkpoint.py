@@ -238,7 +238,6 @@ class LossC:
         print(loss)
 
         if tf.reduce_any(tf.math.is_nan(loss)):
-            loss = tf.convert_to_tensor(0.0)
             print(f'''WHOOPS!
 labels
 ------
@@ -275,8 +274,10 @@ loss
 
 ''')
 
-        
-        loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
+        if tf.reduce_any(tf.math.is_nan(loss)):
+            loss_metric.update_state(0.0, sample_weight=y_pred.shape[0])
+        else:
+            loss_metric.update_state(loss, sample_weight=y_pred.shape[0])
 
         ##### ACCURACY #####
 
