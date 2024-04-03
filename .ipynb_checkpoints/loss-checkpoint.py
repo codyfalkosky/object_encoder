@@ -16,6 +16,9 @@ class LossC:
     def __init__(self, parent_obj):
         self.parent_obj = parent_obj
 
+        self.train_cos_sim = []
+        self.valid_cos_sim = []
+        
     def _cosine_similiarty(self, x):
         '''
         given a matrix a, computes cosine similarity of all vectors in a to all other vectors in a
@@ -202,7 +205,7 @@ class LossC:
         return loss
         
 
-    def calc_loss_with_margin(self, model_output, labels, loss_metric, accuracy_metric, decode_params):
+    def calc_loss_with_margin(self, model_output, labels, loss_metric, accuracy_metric, decode_params, for_):
         '''
         Calculates loss for siamese network
 
@@ -223,16 +226,17 @@ class LossC:
         similar   = cos_sim_mat[same_obj]
         different = cos_sim_mat[~same_obj]
         
-        # sim_loss = tf.reduce_sum(sim_thresh - similar[similar < sim_thresh])
-        # dif_loss = tf.reduce_sum(different[different > dif_thresh] - dif_thresh)
-
-        # loss = sim_loss + dif_loss
 
         sim_loss = sim_thresh - similar[similar < sim_thresh]
         dif_loss = different[different > dif_thresh] - dif_thresh
 
         y_pred = tf.concat([sim_loss, dif_loss], axis=-1)
         y_pred = tf.reshape(y_pred, [-1])
+
+        if for_ == 'train':
+            self.train_cos_sim.extend(cos_sim_mat.numpy().ravel().tolist())
+        elif for_ == 'valid':
+            self.valid_cos_sim.extend(cos_sim_mat.numpy().ravel().tolist())
         
         y_true = tf.zeros_like(y_pred)
 

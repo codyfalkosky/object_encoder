@@ -49,7 +49,7 @@ class Training:
         with tf.GradientTape() as tape:
             model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=True)
             loss      = self.parent_obj.loss(model_out, batch['labels'], self.train_metric, self.train_accuracy_metric,
-                                             decode_params)
+                                             decode_params, for_='train')
 
         if not tf.math.is_nan(loss):
             gradients = tape.gradient(loss, self.parent_obj.model.trainable_variables)
@@ -78,7 +78,8 @@ class Training:
             update to metric to accuracy 
         '''
         model_out = self.parent_obj.model([batch['objects'], batch['coords']], training=False)
-        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric, decode_params)
+        loss      = self.parent_obj.loss(model_out, batch['labels'], self.valid_metric, self.valid_accuracy_metric,
+                                             decode_params, for_='valid')
 
     def plot_loss(self):
         '''
@@ -87,8 +88,8 @@ class Training:
         '''
         clear_output(wait=True)
 
-        plt.figure(figsize=(10, 5))
-        plt.subplot(1,2,1)
+        plt.figure(figsize=(15, 5))
+        plt.subplot(1,3,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
         plt.plot(self.valid_loss,  color='C1')
@@ -104,12 +105,22 @@ class Training:
             plt.ylim([0, 1])
 
 
-        plt.subplot(1,2,2)
+        plt.subplot(1,3,2)
         plt.title('Accuracy')
 
         plt.plot(self.train_accuracy, color='C0')
         plt.plot(self.valid_accuracy, color='C1')
         plt.ylim([0, 1])
+
+        plt.subplot(1,3,3)
+
+        t_len = len(self.parent_obj.loss_obj.train_cos_sim)
+        v_len = len(self.parent_obj.loss_obj.valid_cos_sim)
+        
+        plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color='C0', marker='.', alpha=.5, s=1)
+        plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color='C1', marker='.', alpha=.5, s=1)
+        plt.ylim([-1, 1])
+        plt.xticks([])        
         plt.show()
 
     def save_best(self, save_best_folder, save_below):
@@ -180,6 +191,10 @@ class Training:
         
 
         while True:
+
+            self.parent_obj.loss_obj.train_cos_sim = []
+            self.parent_obj.loss_obj.valid_cos_sim = []
+        
             print(f'Training Epoch: {len(self.train_loss)}')
             for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
                 self.train_step(batch, decode_params)
