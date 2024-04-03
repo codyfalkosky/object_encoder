@@ -214,7 +214,7 @@ class LossC:
             loss (tensor) : single scalar loss value
         
         '''
-        sim_thresh = .7
+        sim_thresh = .95
         dif_thresh = .5
         
         same_obj    = self._label_mask(labels)                 # [n_labels, n_labels] bool

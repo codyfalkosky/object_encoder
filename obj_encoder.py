@@ -94,7 +94,7 @@ class ObjectEncoder:
             trained model at self.model            
         '''
         self.training.fit(optimizer, save_best_folder, save_below, epochs, similarity_threshold, percentile,
-                         decode_basis='cosine', euclidean_thresh=.5)
+                         decode_basis, euclidean_thresh)
 
     def label(self, model_inputs, **kwargs):
         '''
