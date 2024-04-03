@@ -239,7 +239,7 @@ class LossC:
         loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
 
         if self.parent_obj.verbose > 0:
-        print(loss)
+            print(loss)
 
         
         if self.parent_obj.verbose > 1:
