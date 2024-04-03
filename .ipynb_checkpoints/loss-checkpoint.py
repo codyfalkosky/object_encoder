@@ -13,6 +13,8 @@ labels   = tf.convert_to_tensor([1., 2., 3., 1., 2., 3., 1., 2., 3., 4.])
 
 class LossC:
     'Object Encoder loss using cosine similarity'
+    def __init__(self, parent_obj):
+        self.parent_obj = parent_obj
 
     def _cosine_similiarty(self, x):
         '''
@@ -235,44 +237,48 @@ class LossC:
         y_true = tf.zeros_like(y_pred)
 
         loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
+
+        if self.parent_obj.verbose > 0:
         print(loss)
 
-        if tf.reduce_any(tf.math.is_nan(loss)):
-            print(f'''WHOOPS!
-labels
-------
-{labels}
-
-
-similar
--------
-{similar}
-
-different
----------
-{different}
-
-sim_loss
---------
-{sim_loss}
-
-dif_loss
---------
-{dif_loss}
-
-y_pred
-------
-{y_pred}
-
-y_true
-------
-{y_true}
-
-loss
-----
-{loss}
-
-''')
+        
+        if self.parent_obj.verbose > 1:
+            if tf.reduce_any(tf.math.is_nan(loss)):
+                print(f'''WHOOPS!
+    labels
+    ------
+    {labels}
+    
+    
+    similar
+    -------
+    {similar}
+    
+    different
+    ---------
+    {different}
+    
+    sim_loss
+    --------
+    {sim_loss}
+    
+    dif_loss
+    --------
+    {dif_loss}
+    
+    y_pred
+    ------
+    {y_pred}
+    
+    y_true
+    ------
+    {y_true}
+    
+    loss
+    ----
+    {loss}
+    
+    ''')
 
         if tf.reduce_any(tf.math.is_nan(loss)):
             loss_metric.update_state(0.0, sample_weight=y_pred.shape[0])

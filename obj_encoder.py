@@ -39,14 +39,14 @@ class ObjectEncoder:
         self.loss_style = loss
         self.verbose = verbose
         if loss == 'cosine':
-            self.loss_obj = LossC()
+            self.loss_obj = LossC(self)
 
             if with_margin:
                 self.loss     = self.loss_obj.calc_loss_with_margin
             else:
                 self.loss     = self.loss_obj.calc_loss
         elif loss == 'euclidian':
-            self.loss_obj     = LossE()
+            self.loss_obj     = LossE(self)
             self.loss         = self.loss_obj.calc_loss
             
         # load all datasets
