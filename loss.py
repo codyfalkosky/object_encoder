@@ -237,7 +237,7 @@ class LossC:
         loss = tf.keras.losses.mean_squared_error(y_true, y_pred)
         print(loss)
 
-        if (np.nan == loss):
+        if tf.reduce_any(tf.math.is_nan(loss)):
             print(f'''WHOOPS!
 similar
 -------
@@ -490,5 +490,15 @@ y_pred = loss._cosine_similiarty(t0)
 not_sim = y_pred[~mask]
 
 not_sim[not_sim < .7]
+
+print(tf.convert_to_tensor(np.nan))
+
+nan = tf.convert_to_tensor(np.nan)
+
+nan == nan
+
+nan
+
+np.isnan(nan)
 
 
