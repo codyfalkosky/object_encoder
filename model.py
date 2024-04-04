@@ -252,91 +252,63 @@ class ObjEncoder:
     
             return model
 
-
-def _build_model(architecture):
-    if architecture == 'MODEL1':
-        '''
-        Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
-        and returning a vector of depth 256 encoding the image
-        '''
-
-        clips_in = Input([32, 40, 3], name='clips_input')
-
-        ######## CLIP STAGE ########
-        x = clips_in
+        ###################
+        #### SIMPLER 2 ####
+        ###################
         
-        # Block 1   
-        x = Conv2D(64, (3, 3), padding='same', name='clip_block1_1')(x)
-        x = BatchNormalization(                name='clip_block1_2')(x)
-        x = ReLU(                              name='clip_block1_3')(x)
-
-        x = Conv2D(64, (3, 3), padding='same', name='clip_block1_4')(x)
-        x = BatchNormalization(                name='clip_block1_5')(x)
-        x = ReLU(                              name='clip_block1_6')(x)
-
-        x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
-
-        # Block 2
-        x = Conv2D(128,(3, 3), padding='same', name='clip_block2_1')(x)
-        x = BatchNormalization(                name='clip_block2_2')(x)
-        x = ReLU(                              name='clip_block2_3')(x)
-
-        x = Conv2D(128,(3, 3), padding='same', name='clip_block2_4')(x)
-        x = BatchNormalization(                name='clip_block2_5')(x)
-        x = ReLU(                              name='clip_block2_6')(x)
-
-        x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
-
-        # Block 3
-        x = Conv2D(256,(3, 3), padding='same', name='clip_block3_1')(x)
-        x = BatchNormalization(                name='clip_block3_2')(x)
-        x = ReLU(                              name='clip_block3_3')(x)
+        elif architecture == 'SIMPLER2':
+            '''
+            Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
+            and returning a vector of depth 256 encoding the image
+            '''
     
-        x = Conv2D(256,(3, 3), padding='same', name='clip_block3_4')(x)
-        x = BatchNormalization(                name='clip_block3_5')(x)
-        x = ReLU(                              name='clip_block3_6')(x)
+            clips_in = Input([32, 40, 3], name='clips_input')
     
-        x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
-        
-        clips_out = Flatten()(x)
+            ######## CLIP STAGE ########
+            x = clips_in
+            
+            # Block 1   
+            x = Conv2D(16, (3, 3), padding='same', name='clip_block1_1')(x)
+            x = ReLU(                              name='clip_block1_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
+    
+            # Block 2
+            x = Conv2D(32, (3, 3), padding='same', name='clip_block2_1')(x)
+            x = ReLU(                              name='clip_block2_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
+  
+            # Block 3
+            x = Conv2D(64, (3, 3), padding='same', name='clip_block3_1')(x)
+            x = ReLU(                              name='clip_block3_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
+            
+            clips_out = Flatten()(x)
+    
+            ######## COORDS STAGE ########
+    
+            coords_in = Input([4], name='coords_input')
+    
+            x = coords_in
+            # Block 1
+            x = Dense(8,          name='coords_block1_1')(x)
+            x = ReLU(              name='coords_block1_3')(x)
+    
+            coords_out = x
+    
+            ######## COMBINED STAGE ########
+            
+            x = Concatenate(       name='concatenate')([coords_out, clips_out])
+    
+            # Block 1
+            x = Dense(16,          name='combined_block1_1')(x)
+            x = ReLU(              name='combined_block1_3')(x)
 
-        ######## COORDS STAGE ########
-
-        coords_in = Input([4], name='coords_input')
-
-        x = coords_in
-        # Block 1
-        x = Dense(32,          name='coords_block1_1')(x)
-        x = BatchNormalization(name='coords_block1_2')(x)
-        x = ReLU(              name='coords_block1_3')(x)
-
-        # Block 2
-        x = Dense(64,          name='coords_block2_4')(x)
-        x = BatchNormalization(name='coords_block2_5')(x)
-        x = ReLU(              name='coords_block2_6')(x)
-
-        coords_out = x
-
-        ######## COMBINED STAGE ########
-        
-        x = Concatenate(       name='concatenate')([coords_out, clips_out])
-
-        # Block 1
-        x = Dense(1024,        name='combined_block1_1')(x)
-        x = BatchNormalization(name='combined_block1_2')(x)
-        x = ReLU(              name='combined_block1_3')(x)
-
-        # Block 2
-        x = Dense(512,         name='combined_block2_4')(x)
-        x = BatchNormalization(name='combined_block2_5')(x)
-        x = ReLU(              name='combined_block2_6')(x)
-
-        x = Dense(256,         name='output')(x)        
-
-        model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
-
-        return model
-
+    
+            x = Dense(8,         name='output')(x)        
+    
+            model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
+    
+            return model
 
 if __name__ == '__main__':
     rows = 305
@@ -347,7 +319,3 @@ if __name__ == '__main__':
     # print(model_output)
     # plot_model(siamese_model.model, show_shapes=True, show_layer_names=True)
     siamese_model.model.summary()
-
-_build_model('MODEL1')
-
-

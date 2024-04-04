@@ -118,12 +118,18 @@ class Training:
         v_len = len(self.parent_obj.loss_obj.valid_cos_sim)
 
         plt.title('Embedding Vectors: cos_sim')
-        plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color='C0', marker='.', alpha=.2, s=1)
-        plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color='C1', marker='.', alpha=.2, s=1)
+        color_dict = {0:'C0', 1:'C1'}
+        c = [color_dict[n] for n in self.parent_obj.loss_obj.train_labels]
+        plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color=c, marker='.', alpha=.2, s=1)
+        color_dict = {0:'C2', 1:'C3'}
+        c = [color_dict[n] for n in self.parent_obj.loss_obj.valid_labels]
+        plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color=c, marker='.', 
+                    alpha=.2, s=1)
         plt.ylim([-1, 1])
-        plt.xticks([])        
+        plt.xticks([])
+        if self.save_fig_folder:
+            plt.savefig(f'{self.save_fig_folder}/fig_{len(self.train_accuracy)}.png')
         plt.show()
-        # plt.savefig(f'/Users/codyfalkosky/Desktop/progress/fig_{self.optimizer.iterations.numpy()}.png')
 
     def save_best(self, save_best_folder, save_below):
         '''
@@ -196,6 +202,8 @@ class Training:
 
             self.parent_obj.loss_obj.train_cos_sim = []
             self.parent_obj.loss_obj.valid_cos_sim = []
+            self.parent_obj.loss_obj.train_labels  = []
+            self.parent_obj.loss_obj.valid_labels  = []
         
             # print(f'Training Epoch: {len(self.train_loss)}')
             print(f'{len(self.train_loss)}', end=' ')
@@ -229,7 +237,7 @@ class Training:
                 self.save_best(save_best_folder, save_below)
 
             # show loss
-            if len(self.train_loss) % 20 == 0:
+            if len(self.train_loss) % self.save_fig_every == 0:
                 self.plot_loss()
 
 

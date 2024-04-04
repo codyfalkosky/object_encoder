@@ -18,6 +18,9 @@ class LossC:
 
         self.train_cos_sim = []
         self.valid_cos_sim = []
+
+        self.train_labels  = []
+        self.valid_labels  = []
         
     def _cosine_similiarty(self, x):
         '''
@@ -190,7 +193,7 @@ class LossC:
         y_pred = self._cosine_similiarty(model_output)
         y_pred = tf.reshape(y_pred, [-1])
 
-        if for_ == 'train':
+        if for_   == 'train':
             self.train_cos_sim.extend(y_pred.numpy().ravel().tolist())
         elif for_ == 'valid':
             self.valid_cos_sim.extend(y_pred.numpy().ravel().tolist())
@@ -240,8 +243,10 @@ class LossC:
 
         if for_ == 'train':
             self.train_cos_sim.extend(cos_sim_mat.numpy().ravel().tolist())
+            self.train_labels.extend(same_obj.numpy().astype(int).ravel().tolist())
         elif for_ == 'valid':
             self.valid_cos_sim.extend(cos_sim_mat.numpy().ravel().tolist())
+            self.valid_labels.extend(same_obj.numpy().astype(int).ravel().tolist())
         
         y_true = tf.zeros_like(y_pred)
 

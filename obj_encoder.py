@@ -8,7 +8,8 @@ from .decode import decode_to_labels
 
 class ObjectEncoder:
     def __init__(self, train_data_paths=None, valid_data_paths=None, loss='cosine',
-                load_weights=None, with_margin=False, verbose=0, architecture='MODEL1'):
+                load_weights=None, with_margin=False, verbose=0, architecture='MODEL1',
+                save_fig_folder=None, save_fig_every=1):
         '''
         Top level class for building, training, loading and predicting object encodings
 
@@ -73,6 +74,8 @@ class ObjectEncoder:
 
         # load training loops
         self.training = Training(self)
+        self.training.save_fig_folder = save_fig_folder
+        self.training.save_fig_every  = save_fig_every
 
     def fit(self, optimizer=None, save_best_folder=None, save_below=None, epochs=None, 
             similarity_threshold=.99, percentile=.3, decode_basis='cosine', euclidean_thresh=.5,
