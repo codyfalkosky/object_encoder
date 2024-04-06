@@ -158,7 +158,7 @@ class ObjEncoder:
         #### SIMPLER ####
         #################
         
-        elif architecture == 'SIMPLER':
+        elif architecture == 'SIMPLER_8':
             '''
             Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
             and returning a vector of depth 256 encoding the image
@@ -223,14 +223,19 @@ class ObjEncoder:
             x = clips_in
             
             # Block 1   
-            x = Conv2D(16, (8, 10), padding='same', name='clip_block1_1')(x)
+            x = Conv2D(8, (8, 10), padding='same', name='clip_block1_1')(x)
             x = ReLU(                               name='clip_block1_3')(x)    
             x = MaxPool2D((2, 2), 2,                name='clip_block1_7')(x)
     
             # Block 2
-            x = Conv2D(32, (8, 10), padding='same', name='clip_block2_1')(x)
+            x = Conv2D(16, (8, 10), padding='same', name='clip_block2_1')(x)
             x = ReLU(                               name='clip_block2_3')(x)    
             x = MaxPool2D((2, 2), 2,                name='clip_block2_7')(x)
+
+            # Block 2
+            x = Conv2D(32, (8, 10), padding='same', name='clip_block3_1')(x)
+            x = ReLU(                               name='clip_block3_3')(x)    
+            x = MaxPool2D((2, 2), 2,                name='clip_block3_7')(x)
             
             x = Flatten()(x)
     
@@ -253,10 +258,10 @@ class ObjEncoder:
             return model
 
         ###################
-        #### SIMPLER 2 ####
+        #### SIMPLER 4 ####
         ###################
         
-        elif architecture == 'SIMPLER2':
+        elif architecture == 'SIMPLER_4':
             '''
             Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
             and returning a vector of depth 256 encoding the image
@@ -290,7 +295,7 @@ class ObjEncoder:
     
             x = coords_in
             # Block 1
-            x = Dense(8,          name='coords_block1_1')(x)
+            x = Dense(4,          name='coords_block1_1')(x)
             x = ReLU(              name='coords_block1_3')(x)
     
             coords_out = x
@@ -300,7 +305,171 @@ class ObjEncoder:
             x = Concatenate(       name='concatenate')([coords_out, clips_out])
     
             # Block 1
-            x = Dense(16,          name='combined_block1_1')(x)
+            x = Dense(8,          name='combined_block1_1')(x)
+            x = ReLU(              name='combined_block1_3')(x)
+
+    
+            x = Dense(4,         name='output')(x)        
+    
+            model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
+    
+            return model
+
+        #################
+        #### RC1 E4  ####
+        #################
+        
+        elif architecture == 'RC1_E4':
+            '''
+            Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
+            and returning a vector of depth 256 encoding the image
+            '''
+    
+            clips_in = Input([32, 40, 3], name='clips_input')
+    
+            ######## CLIP STAGE ########
+            x = clips_in
+            
+            # Block 1   
+            x = Conv2D(4, (3, 3), padding='same',  name='clip_block1_1')(x)
+            x = ReLU(                              name='clip_block1_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
+    
+            # Block 2
+            x = Conv2D(8, (3, 3), padding='same', name='clip_block2_1')(x)
+            x = ReLU(                              name='clip_block2_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
+  
+            # Block 3
+            x = Conv2D(16, (3, 3), padding='same', name='clip_block3_1')(x)
+            x = ReLU(                              name='clip_block3_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
+            
+            clips_out = Flatten()(x)
+    
+            ######## COORDS STAGE ########
+    
+            coords_in = Input([4], name='coords_input')
+    
+            x = coords_in
+            # Block 1
+            x = Dense(4,          name='coords_block1_1')(x)
+            x = ReLU(              name='coords_block1_3')(x)
+    
+            coords_out = x
+    
+            ######## COMBINED STAGE ########
+            
+            x = Concatenate(       name='concatenate')([coords_out, clips_out])
+    
+            # Block 1
+            x = Dense(8,          name='combined_block1_1')(x)
+            x = ReLU(              name='combined_block1_3')(x)
+
+    
+            x = Dense(4,         name='output')(x)        
+    
+            model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
+    
+            return model
+
+        #################
+        #### BASIC 1 ####
+        #################
+        
+        elif architecture == 'BASIC_1':
+            '''
+            Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
+            and returning a vector of depth 8 encoding the image
+            '''
+    
+            clips_in = Input([32, 40, 3], name='clips_input')
+    
+            ######## CLIP STAGE ########
+            x = clips_in
+            
+            # Block 1   
+            x = Conv2D(8, (3, 3), padding='same',  name='clip_block1_1')(x)
+            x = ReLU(                              name='clip_block1_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
+            
+            clips_out = Flatten()(x)
+    
+            ######## COORDS STAGE ########
+    
+            coords_in = Input([4], name='coords_input')
+    
+            x = coords_in
+            # # Block 1
+            # x = Dense(4,          name='coords_block1_1')(x)
+            # x = ReLU(              name='coords_block1_3')(x)
+    
+            coords_out = x
+    
+            ######## COMBINED STAGE ########
+            
+            x = Concatenate(       name='concatenate')([coords_out, clips_out])
+    
+            # Block 1
+            x = Dense(8,          name='combined_block1_1')(x)
+            x = ReLU(              name='combined_block1_3')(x)
+
+    
+            x = Dense(8,         name='output')(x)        
+    
+            model = tf.keras.Model(inputs=[clips_in, coords_in], outputs=[x], name='obj_encoder')
+    
+            return model
+
+        #################
+        #### BASIC 2 ####
+        #################
+        
+        elif architecture == 'BASIC_2':
+            '''
+            Architecture for an object encoder taking an input of [image_tensor (32, 40, 3), coords_tensor (4,) cxcywh]
+            and returning a vector of depth 256 encoding the image
+            '''
+    
+            clips_in = Input([32, 40, 3], name='clips_input')
+    
+            ######## CLIP STAGE ########
+            x = clips_in
+            
+            # Block 1   
+            x = Conv2D(8, (3, 3), padding='same',  name='clip_block1_1')(x)
+            x = ReLU(                              name='clip_block1_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block1_7')(x)
+    
+            # # Block 2
+            # x = Conv2D(16, (3, 3), padding='same', name='clip_block2_1')(x)
+            # x = ReLU(                              name='clip_block2_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block2_7')(x)
+  
+            # # Block 3
+            # x = Conv2D(16, (3, 3), padding='same', name='clip_block3_1')(x)
+            # x = ReLU(                              name='clip_block3_3')(x)    
+            x = MaxPool2D((2, 2), 2,               name='clip_block3_7')(x)
+            
+            clips_out = Flatten()(x)
+    
+            ######## COORDS STAGE ########
+    
+            coords_in = Input([4], name='coords_input')
+    
+            x = coords_in
+            # # Block 1
+            # x = Dense(4,          name='coords_block1_1')(x)
+            # x = ReLU(              name='coords_block1_3')(x)
+    
+            coords_out = x
+    
+            ######## COMBINED STAGE ########
+            
+            x = Concatenate(       name='concatenate')([coords_out, clips_out])
+    
+            # Block 1
+            x = Dense(8,          name='combined_block1_1')(x)
             x = ReLU(              name='combined_block1_3')(x)
 
     
@@ -311,11 +480,5 @@ class ObjEncoder:
             return model
 
 if __name__ == '__main__':
-    rows = 305
-    clips_data    = tf.random.normal([rows, 32, 40, 3])
-    coords_data   = tf.random.normal([rows, 4])
-    siamese_model = SiameseModel()
-    model_output  = siamese_model.model([clips_data, coords_data])
-    # print(model_output)
-    # plot_model(siamese_model.model, show_shapes=True, show_layer_names=True)
-    siamese_model.model.summary()
+    obj_encoder = ObjEncoder('BASIC_2')
+    obj_encoder.model.summary()

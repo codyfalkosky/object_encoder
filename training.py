@@ -4,6 +4,7 @@ import tensorflow as tf
 from tqdm.notebook import tqdm
 from IPython.display import clear_output
 import pickle
+import time
 
 
 # +
@@ -23,6 +24,8 @@ class Training:
 
         self.train_accuracy_metric = tf.keras.metrics.Mean()
         self.valid_accuracy_metric = tf.keras.metrics.Mean()
+
+        self.time_per_epoch = []
 
     def train_step(self, batch, decode_params):
         '''
@@ -129,7 +132,8 @@ class Training:
         plt.xticks([])
         if self.save_fig_folder:
             plt.savefig(f'{self.save_fig_folder}/fig_{len(self.train_accuracy)}.png')
-        plt.show()
+        # plt.show()
+        
 
     def save_best(self, save_best_folder, save_below):
         '''
@@ -204,6 +208,8 @@ class Training:
             self.parent_obj.loss_obj.valid_cos_sim = []
             self.parent_obj.loss_obj.train_labels  = []
             self.parent_obj.loss_obj.valid_labels  = []
+
+            start = time.time()
         
             # print(f'Training Epoch: {len(self.train_loss)}')
             print(f'{len(self.train_loss)}', end=' ')
@@ -232,17 +238,23 @@ class Training:
             self.valid_accuracy.append(self.valid_accuracy_metric.result().numpy())
             self.valid_accuracy_metric.reset_state()
 
+            end = time.time()
+            self.time_per_epoch.append(end-start)
+
             # save if best
             if save_best_folder:
                 self.save_best(save_best_folder, save_below)
 
+            history_len = len(self.train_loss)
+
             # show loss
-            if len(self.train_loss) % self.save_fig_every == 0:
+            if (history_len % self.save_fig_every == 0) or (history_len == 1):
                 self.plot_loss()
 
 
             if epochs:
                 if len(self.train_accuracy) > epochs:
                     break
+
     
     
