@@ -93,7 +93,7 @@ class Training:
 
         plt.figure(figsize=(15, 5))
         # plt.subplot(1,3,1)
-        plt.subplot(1,2,112)
+        plt.subplot(1,2,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
         plt.plot(self.valid_loss,  color='C1')
