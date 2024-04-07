@@ -92,7 +92,8 @@ class Training:
         clear_output(wait=True)
 
         plt.figure(figsize=(15, 5))
-        plt.subplot(1,3,1)
+        # plt.subplot(1,3,1)
+        plt.subplot(1,2,112)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
         plt.plot(self.train_loss,  color='C0')
         plt.plot(self.valid_loss,  color='C1')
@@ -108,28 +109,30 @@ class Training:
             plt.ylim([0, 1])
 
 
-        plt.subplot(1,3,2)
+        # plt.subplot(1,3,2)
+        plt.subplot(1,2,2)
         plt.title('Accuracy')
 
         plt.plot(self.train_accuracy, color='C0')
         plt.plot(self.valid_accuracy, color='C1')
         plt.ylim([0, 1])
 
-        plt.subplot(1,3,3)
+        
+        # plt.subplot(1,3,3)
 
-        t_len = len(self.parent_obj.loss_obj.train_cos_sim)
-        v_len = len(self.parent_obj.loss_obj.valid_cos_sim)
+        # t_len = len(self.parent_obj.loss_obj.train_cos_sim)
+        # v_len = len(self.parent_obj.loss_obj.valid_cos_sim)
 
-        plt.title('Embedding Vectors: cos_sim')
-        color_dict = {0:'C0', 1:'C1'}
-        c = [color_dict[n] for n in self.parent_obj.loss_obj.train_labels]
-        plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color=c, marker='.', alpha=.2, s=1)
-        color_dict = {0:'C2', 1:'C3'}
-        c = [color_dict[n] for n in self.parent_obj.loss_obj.valid_labels]
-        plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color=c, marker='.', 
-                    alpha=.2, s=1)
-        plt.ylim([-1, 1])
-        plt.xticks([])
+        # plt.title('Embedding Vectors: cos_sim')
+        # color_dict = {0:'C0', 1:'C1'}
+        # c = [color_dict[n] for n in self.parent_obj.loss_obj.train_labels]
+        # plt.scatter(range(t_len), self.parent_obj.loss_obj.train_cos_sim, color=c, marker='.', alpha=.2, s=1)
+        # color_dict = {0:'C2', 1:'C3'}
+        # c = [color_dict[n] for n in self.parent_obj.loss_obj.valid_labels]
+        # plt.scatter(range(t_len, t_len+v_len), self.parent_obj.loss_obj.valid_cos_sim, color=c, marker='.', 
+        #             alpha=.2, s=1)
+        # plt.ylim([-1, 1])
+        # plt.xticks([])
         if self.save_fig_folder:
             plt.savefig(f'{self.save_fig_folder}/fig_{len(self.train_accuracy)}.png')
         # plt.show()
@@ -204,10 +207,10 @@ class Training:
 
         while True:
 
-            self.parent_obj.loss_obj.train_cos_sim = []
-            self.parent_obj.loss_obj.valid_cos_sim = []
-            self.parent_obj.loss_obj.train_labels  = []
-            self.parent_obj.loss_obj.valid_labels  = []
+            # self.parent_obj.loss_obj.train_cos_sim = []
+            # self.parent_obj.loss_obj.valid_cos_sim = []
+            # self.parent_obj.loss_obj.train_labels  = []
+            # self.parent_obj.loss_obj.valid_labels  = []
 
             start = time.time()
         
