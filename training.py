@@ -91,7 +91,7 @@ class Training:
         '''
         clear_output(wait=True)
 
-        plt.figure(figsize=(15, 5))
+        plt.figure(figsize=(10, 5))
         # plt.subplot(1,3,1)
         plt.subplot(1,2,1)
         plt.title(f"Last Epoch Valid Loss: {self.valid_loss[-1]:.5f}")
@@ -133,9 +133,9 @@ class Training:
         #             alpha=.2, s=1)
         # plt.ylim([-1, 1])
         # plt.xticks([])
-        if self.save_fig_folder:
-            plt.savefig(f'{self.save_fig_folder}/fig_{len(self.train_accuracy)}.png')
-        # plt.show()
+        # if self.save_fig_folder:
+        #     plt.savefig(f'{self.save_fig_folder}/fig_{len(self.train_accuracy)}.png')
+        plt.show()
         
 
     def save_best(self, save_best_folder, save_below):
@@ -215,7 +215,7 @@ class Training:
             start = time.time()
         
             # print(f'Training Epoch: {len(self.train_loss)}')
-            print(f'{len(self.train_loss)}', end=' ')
+            # print(f'{len(self.train_loss)}', end=' ')
             # for batch in tqdm(self.parent_obj.dataset['train'], total=train_data_len):
             for batch in self.parent_obj.dataset['train']:
                 self.train_step(batch, decode_params)
