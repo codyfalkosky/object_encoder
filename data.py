@@ -14,8 +14,8 @@ class Data:
         self.records_path_list = records_path_list
         self._build_dataset()
 
-    @staticmethod
-    def parse_tfrecord_fn(serialized_example):
+    @tf.function
+    def parse_tfrecord_fn(self, serialized_example):
         '''
         takes a seralized tfr and parses to objects, labels, coords dictionary
 
@@ -51,6 +51,7 @@ class Data:
         self.dataset = tf.data.TFRecordDataset(self.records_path_list)
         self.dataset = self.dataset.map(self.parse_tfrecord_fn)
         self.dataset = self.dataset.cache()
+        self.dataset = self.dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         # self.dataset = self.dataset.shuffle(buffer_size=1024)
         
 
