@@ -183,7 +183,7 @@ class ObjEncoder:
             x = MaxPool2D((2, 2), 2,                   name='clip_block2_7')(x)
 
 
-            x = MaxPool2D((2, 2), 2,                   name='clip_block2_7')(x)
+            x = MaxPool2D((2, 2), 2,                   name='clip_block3_7')(x)
             
             clips_out = Flatten()(x)
     
