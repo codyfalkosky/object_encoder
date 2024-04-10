@@ -8,7 +8,7 @@ from .decode import decode_to_labels
 
 class ObjectEncoder:
     def __init__(self, train_data_paths=None, valid_data_paths=None, loss='cosine',
-                load_weights=None, with_margin=False, verbose=0, architecture='MODEL1',
+                load_weights=None, with_margin=False, verbose=0, architecture='MODEL1', model_params={},
                 save_fig_folder=None, save_fig_every=1):
         '''
         Top level class for building, training, loading and predicting object encodings
@@ -64,7 +64,7 @@ class ObjectEncoder:
             self.dataset['valid']  = []
 
         # initalize model
-        self.model    = ObjEncoder(architecture).model
+        self.model    = ObjEncoder(architecture, model_params).model
 
         if load_weights:
             self.model.load_weights(load_weights)
